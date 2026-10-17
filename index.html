@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>トレーニング・クエスト：失われた冒険者の世界</title>
+<style>
+:root{--bg:#07071a;--panel:#12122b;--line:#3d3d8f;--glow:#6a7cff;--purple:#a45cff;--text:#e6e6ff;--dim:#9a9ad0;--gold:#ffd24a;--hp:#e04a5a;--mp:#4a8cff;--exp:#8cff7a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#04040d;color:var(--text);font-family:"DotGothic16","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",monospace;font-size:15px;line-height:1.5;touch-action:manipulation}
+button,input,select,textarea{font:inherit}
+#app{max-width:620px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--bg);border-left:2px solid #1a1a44;border-right:2px solid #1a1a44;padding-bottom:env(safe-area-inset-bottom)}
+#hud{display:none;background:linear-gradient(#1a1a40,#101030);border-bottom:3px solid var(--line);padding:6px 8px}
+#hud .r1{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px;gap:6px}
+#hud .r1 b{color:var(--gold)}
+.bars{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.bar{position:relative;height:14px;background:#05051a;border:2px solid #000;outline:1px solid var(--line)}
+.bar i{position:absolute;left:0;top:0;bottom:0;display:block;transition:width .25s}
+.bar span{position:absolute;left:0;right:0;top:0;font-size:10px;line-height:10px;text-align:center;text-shadow:1px 1px 0 #000;white-space:nowrap}
+.bar.big{height:18px}.bar.big span{font-size:12px;line-height:14px}
+#stage{position:relative;background:#000;border-bottom:3px solid var(--line);overflow:hidden}
+#cv{display:block;width:100%;height:auto;aspect-ratio:16/9;image-rendering:pixelated;image-rendering:crisp-edges}
+#fxl,#flash,#banner,#toasts{position:absolute;pointer-events:none}
+#fxl,#flash{inset:0}
+#flash{opacity:0}
+#flash.go{animation:fl .35s ease-out}
+@keyframes fl{0%{opacity:.8}100%{opacity:0}}
+#stage.shake{animation:sh .35s}
+@keyframes sh{0%,100%{transform:translate(0)}20%{transform:translate(-5px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,-2px)}80%{transform:translate(4px,2px)}}
+.pop{position:absolute;font-weight:bold;font-size:22px;text-shadow:2px 2px 0 #000,-1px -1px 0 #000;animation:pp 1s ease-out forwards;transform:translateX(-50%)}
+.pop.d{color:#fff}.pop.c{color:#ffd24a;font-size:28px}.pop.h{color:#6aff9a}.pop.m{color:#9ac8ff}.pop.x{color:#ff6a6a}.pop.t{color:#ccc;font-size:18px}
+@keyframes pp{0%{opacity:0;margin-top:10px}15%{opacity:1}100%{opacity:0;margin-top:-40px}}
+#banner{left:0;right:0;top:34%;text-align:center;font-size:26px;font-weight:bold;letter-spacing:2px;text-shadow:3px 3px 0 #000,0 0 14px currentColor;opacity:0}
+#banner.go{animation:bn 1.6s ease-out}
+@keyframes bn{0%{opacity:0;transform:scale(.6)}15%{opacity:1;transform:scale(1.1)}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+#toasts{left:6px;right:6px;top:6px;display:flex;flex-direction:column;gap:4px;align-items:center}
+.toast{background:rgba(10,10,40,.92);border:2px solid var(--purple);padding:4px 10px;font-size:13px;animation:ts 2.8s forwards;box-shadow:0 0 10px var(--purple)}
+@keyframes ts{0%{opacity:0;transform:translateY(-8px)}10%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0}}
+#panel{flex:1;padding:10px;background:linear-gradient(#12122b,#0a0a1e)}
+#nav{display:none;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px;background:#0d0d26;border-top:3px solid var(--line)}
+.nb{font-size:11px;min-height:44px;padding:2px;color:var(--text);background:#1b1b48;border:2px solid #3a3a90;box-shadow:0 2px 0 #000;cursor:pointer;line-height:1.2}
+.nb:active{transform:translateY(2px);box-shadow:none}
+h2{margin:0 0 6px;font-size:18px;color:#cdd3ff;text-shadow:0 0 8px var(--glow);border-bottom:2px dashed var(--line);padding-bottom:4px}
+h3{margin:10px 0 4px;font-size:15px;color:var(--purple)}
+p{margin:4px 0}
+.txt{color:var(--text)}.dim{color:var(--dim);font-size:13px}.gold{color:var(--gold)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0}
+.col{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.btn{color:var(--text);background:linear-gradient(#2e2e72,#1c1c4a);border:2px solid var(--glow);box-shadow:0 3px 0 #000,inset 0 0 0 2px #0c0c34;padding:8px 6px;min-height:46px;cursor:pointer;text-align:center;border-radius:0}
+.btn:hover{filter:brightness(1.2)}
+.btn:active{transform:translateY(3px);box-shadow:0 0 0 #000,inset 0 0 0 2px #0c0c34}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.6)}
+.btn.atk{border-color:#ff6a6a;background:linear-gradient(#6a2030,#3a1020)}
+.btn.def{border-color:#6ad0ff;background:linear-gradient(#20507a,#102a4a)}
+.btn.skl{border-color:#c48cff;background:linear-gradient(#502a7a,#2a1048)}
+.btn.itm{border-color:#6aff9a;background:linear-gradient(#206a40,#103a24)}
+.btn.sm{min-height:36px;padding:4px 8px;font-size:13px}
+.btn.on{border-color:var(--gold);box-shadow:0 3px 0 #000,0 0 8px var(--gold)}
+.box{background:#0c0c26;border:2px solid var(--line);padding:8px;margin:6px 0}
+.log{background:#05051a;border:2px solid #2a2a66;padding:6px 8px;min-height:84px;font-size:14px}
+.log div{margin:1px 0}.log div:last-child{color:#fff}
+.log div:not(:last-child){color:#a8a8d8}
+.item{display:flex;justify-content:space-between;align-items:center;gap:6px;border-bottom:1px dotted #333377;padding:6px 0}
+.item .l{flex:1;min-width:0}.item .r{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.tag{display:inline-block;font-size:11px;border:1px solid currentColor;padding:0 4px;margin-left:4px}
+.tabs{display:flex;gap:4px;margin:6px 0}.tabs .btn{flex:1;min-height:38px;padding:4px}
+input[type=text],input[type=number],select,textarea{width:100%;background:#05051a;color:var(--text);border:2px solid var(--glow);padding:8px;border-radius:0}
+input[type=range]{width:100%;accent-color:var(--purple)}
+label{display:block;margin:6px 0 2px;font-size:13px;color:var(--dim)}
+.title-wrap{text-align:center;padding:10px 0}
+.gtitle{font-size:26px;line-height:1.3;margin:10px 0 2px;color:#dfe4ff;text-shadow:0 0 6px #6a7cff,0 0 18px #a45cff,3px 3px 0 #000;letter-spacing:2px}
+.gsub{font-size:15px;color:#c8a8ff;margin-bottom:12px;text-shadow:0 0 8px #a45cff}
+.dlg{background:#0a0a2a;border:3px solid var(--glow);padding:10px;min-height:96px;box-shadow:inset 0 0 0 2px #000}
+.dlg .who{color:var(--gold);font-weight:bold;margin-bottom:4px}
+.jobc{border:2px solid var(--line);padding:8px;margin:6px 0;cursor:pointer;background:#0c0c26}
+.jobc.on{border-color:var(--gold);box-shadow:0 0 10px var(--gold)}
+.dexg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dexc{border:2px solid var(--line);padding:6px;background:#0c0c26;font-size:12px}
+.dexc img{width:48px;height:48px;image-rendering:pixelated;float:left;margin-right:6px;background:#05051a;border:1px solid #333}
+.dexc.un img{filter:brightness(0)}
+#modal{position:fixed;inset:0;background:rgba(0,0,10,.75);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+#modal[hidden]{display:none}
+.mbox{background:#10102e;border:3px solid var(--purple);box-shadow:0 0 20px var(--purple);padding:14px;max-width:420px;width:100%}
+.hl{color:#ffd24a}.rare{color:#5aa8ff}.epic{color:#b46bff}.legend{color:#ffb53a;text-shadow:0 0 6px #ff8a00}.common{color:#cfd0e8}
+.ok{color:#6aff9a}.ng{color:#ff7a7a}
+@media (min-width:700px){body{font-size:16px}.gtitle{font-size:32px}}
+@media (prefers-reduced-motion:reduce){.pop,.toast,#banner.go{animation-duration:.01s}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hud"></div>
+  <div id="stage">
+    <canvas id="cv" width="192" height="108"></canvas>
+    <div id="fxl"></div><div id="flash"></div><div id="banner"></div><div id="toasts"></div>
+  </div>
+  <div id="panel"></div>
+  <div id="nav"></div>
+</div>
+<div id="modal" hidden><div class="mbox" id="mbox"></div></div>
+<script>
+'use strict';
+/* ============ ユーティリティ ============ */
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function wpick(list){let t=0;for(const x of list)t+=x[1];let r=Math.random()*t;for(const x of list){r-=x[1];if(r<=0)return x}return list[list.length-1]}
+const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const fmt=n=>Math.floor(n).toLocaleString('ja-JP');
+
+/* ============ データ定義 ============ */
+const RAR={common:{n:'コモン'},rare:{n:'レア'},epic:{n:'エピック'},legend:{n:'レジェンド'}};
+const IT={};
+const W=(id,n,r,atk,price,x)=>IT[id]=Object.assign({id,n,t:'weapon',r,atk,price},x||{});
+const A=(id,n,r,def,price,x)=>IT[id]=Object.assign({id,n,t:'armor',r,def,price},x||{});
+const C=(id,n,r,price,x)=>IT[id]=Object.assign({id,n,t:'acc',r,price},x||{});
+const U=(id,n,r,price,desc,x)=>IT[id]=Object.assign({id,n,t:'use',r,price,desc},x||{});
+const M=(id,n,price,desc)=>IT[id]={id,n,t:'mat',r:'common',price,desc};
+W('wood_sword','木の剣','common',3,60,{shop:0});
+W('bronze_sword','青銅の剣','common',7,220,{shop:0});
+W('rod1','見習いの杖','common',4,260,{shop:0,mp:10});
+W('iron_sword','鉄の剣','common',12,650,{shop:1});
+W('rod2','水晶の杖','rare',10,1000,{shop:1,mp:22});
+W('steel_sword','鋼の剣','rare',19,2000,{shop:2});
+W('silver_blade','銀月の剣','rare',21,1600);
+W('dragon_fang','竜牙の大剣','epic',32,3500);
+W('star_staff','星屑の杖','epic',25,3200,{mp:40});
+W('excalibur','聖剣エクスカリバー','legend',50,9000,{hp:50});
+A('cloth','旅人の服','common',2,50,{shop:0});
+A('leather','革の鎧','common',6,260,{shop:0,hp:10});
+A('chain','鎖かたびら','common',11,700,{shop:1,hp:20});
+A('plate','鋼の鎧','rare',18,1900,{shop:2,hp:30});
+A('mithril','ミスリルの鎧','epic',27,3500,{hp:60});
+A('aegis','神盾の鎧','legend',42,9000,{hp:100});
+C('ring_pow','力の指輪','common',400,{shop:0,atk:3});
+C('charm','守りのお守り','common',400,{shop:0,def:3});
+C('bangle','生命の腕輪','common',600,{shop:1,hp:30});
+C('pendant','魔力のペンダント','rare',900,{shop:1,mp:25});
+C('clover','幸運のクローバー','rare',1300,{shop:2,luck:1});
+C('scale','竜鱗のお守り','epic',2800,{def:12,hp:40});
+C('emblem','英雄の紋章','legend',9000,{atk:10,def:10,hp:60,mp:30,luck:1});
+U('herb','薬草','common',15,'HPを30回復',{heal:30,shop:0});
+U('potion','回復薬','common',35,'HPを60回復',{heal:60,shop:0});
+U('hipotion','上級回復薬','rare',120,'HPを180回復',{heal:180,shop:1});
+U('megapotion','特級回復薬','rare',320,'HPを450回復',{heal:450,shop:3});
+U('elixir','エリクサー','epic',900,'HPとMPを全回復',{heal:99999,mpFull:true,shop:2});
+U('ether','魔力の水','common',70,'MPを30回復',{mp:30,shop:0});
+U('antidote','毒消し草','common',25,'毒を治す(戦闘中)',{cure:true,shop:0});
+U('atk_tonic','力の薬','common',80,'戦闘中4ターン ATK+40%',{buff:'atk',shop:0});
+U('def_tonic','守りの薬','common',80,'戦闘中4ターン DEF+40%',{buff:'def',shop:0});
+U('seed_atk','力の種','rare',700,'攻撃力が永久に+1',{perm:'atk',shop:2});
+U('seed_def','守りの種','rare',700,'防御力が永久に+1',{perm:'def',shop:2});
+U('seed_hp','命の種','rare',600,'最大HPが永久に+8',{perm:'hp',shop:2});
+U('seed_mp','魔の種','rare',600,'最大MPが永久に+3',{perm:'mp',shop:2});
+M('jelly','スライムゼリー',8,'ぷるぷるした粘液');
+M('fang','ウルフの牙',14,'鋭い牙');
+M('spore','キノコの胞子',12,'怪しい胞子');
+M('bone','古い骨',14,'年代物の骨');
+M('ore','鉱石',40,'鍛冶屋の強化素材');
+M('frag','光る欠片',60,'古城の封印に反応する欠片');
+const SELL=it=>Math.max(1,Math.floor(it.price*0.4));
+
+/* モンスター */
+const MON={
+slime:{n:'スライム',sh:'slime',pal:{a:'#4adf8a',b:'#2a9f5a',c:'#a8ffd0'},hp:18,atk:5,def:1,exp:7,gold:5,px:3,d:'どこにでもいる軟体の魔物。',drop:['jelly',.5]},
+goblin:{n:'ゴブリン',sh:'hum',pal:{c:'#6fbf4a',a:'#8a5a2a',b:'#5a3a1a',h:'#4a9a3a',e:'#ff4a4a'},hp:28,atk:8,def:2,exp:11,gold:8,px:3,d:'棍棒を振り回す小鬼。',drop:['herb',.3]},
+bat:{n:'コウモリ',sh:'bat',pal:{a:'#7a5aaa',b:'#3a2a6a',e:'#ff6a6a'},hp:22,atk:7,def:1,exp:9,gold:6,px:3,tr:'double',d:'素早く飛び回る。ときどき2回攻撃。',drop:['herb',.2]},
+wolf:{n:'フォレストウルフ',sh:'beast',pal:{a:'#8a8aa0',b:'#5a5a70',e:'#ffd24a'},hp:38,atk:10,def:3,exp:15,gold:11,px:3,tr:'evade',d:'森を駆ける狼。素早く攻撃をかわす。',drop:['fang',.5]},
+mushroom:{n:'毒キノコ',sh:'mush',pal:{a:'#c04a6a',b:'#7a2a4a',c:'#e8d8b8',e:'#222'},hp:32,atk:8,def:3,exp:13,gold:9,px:3,tr:'poison',d:'胞子で毒を与える。',drop:['spore',.4]},
+goblinking:{n:'ゴブリンキング',boss:1,sh:'hum',pal:{c:'#6fbf4a',a:'#a03a2a',b:'#6a1a1a',h:'#ffd24a',e:'#ff2a2a'},hp:160,atk:14,def:5,exp:90,gold:120,px:5,sp:{n:'ロイヤルクラッシュ',m:2,e:3,col:'#ffd24a'},d:'緑の森を支配する王。',drop:['hipotion',.5]},
+spider:{n:'ケーブスパイダー',sh:'spider',pal:{a:'#4a4a5a',b:'#222233',e:'#ff3a3a'},hp:60,atk:16,def:5,exp:28,gold:18,px:3,tr:'poison',d:'洞窟の天井に潜む毒蜘蛛。',drop:['ore',.15]},
+skeleton:{n:'スケルトン',sh:'hum',pal:{c:'#e8e8d8',a:'#b8b8a8',b:'#8a8a7a',h:'#e8e8d8',e:'#4ab0ff'},hp:70,atk:18,def:7,exp:34,gold:22,px:3,d:'彷徨う骸骨の兵士。',drop:['bone',.5]},
+ghost:{n:'ゴースト',sh:'ghost',pal:{a:'#9ad0ff',b:'#6a98d0',e:'#223'},hp:55,atk:17,def:3,exp:32,gold:20,px:3,tr:'drain',d:'生命力を吸い取る亡霊。',drop:['ether',.15]},
+golem:{n:'ゴーレム',sh:'golem',pal:{a:'#8a7a6a',b:'#5a4a3a',c:'#a09080',e:'#ffd24a'},hp:120,atk:21,def:10,exp:52,gold:35,px:4,tr:'heavy',d:'力を溜めて強攻撃を放つ岩の巨人。',drop:['ore',.5]},
+guardian:{n:'守護ゴーレム',boss:1,sh:'golem',pal:{a:'#6a7aa0',b:'#3a4a70',c:'#8a9ac0',e:'#6af0ff'},hp:340,atk:25,def:12,exp:260,gold:260,px:6,sp:{n:'大地の怒り',m:2.2,e:3,col:'#a08060'},d:'洞窟の封印を守る巨像。',drop:['megapotion',.5]},
+darkknight:{n:'暗黒騎士',sh:'hum',pal:{c:'#555577',a:'#2a2a4a',b:'#1a1a30',h:'#333355',e:'#ff3a3a'},hp:150,atk:30,def:15,exp:85,gold:55,px:4,d:'呪われた鎧に宿る騎士。',drop:['hipotion',.2]},
+wyvern:{n:'ワイバーン',sh:'dragon',pal:{a:'#4a8a6a',b:'#2a5a4a',c:'#cfe8a0',e:'#ffe04a'},hp:170,atk:33,def:10,exp:100,gold:70,px:4,tr:'double',d:'空を舞う小型の竜。',drop:['fang',.4]},
+dragon:{n:'古竜ドラゴン',boss:1,sh:'dragon',pal:{a:'#a03a3a',b:'#6a1a1a',c:'#ffd080',e:'#ffe04a'},hp:760,atk:40,def:18,exp:700,gold:600,px:6,sp:{n:'灼熱のブレス',m:2.5,e:3,col:'#ff6a2a'},d:'古城に棲む伝説の竜。',drop:['megapotion',.6]},
+demon:{n:'魔王',boss:1,sh:'demon',pal:{a:'#6a2a8a',b:'#3a1a5a',c:'#ffcab0',e:'#ff2a2a'},hp:1500,atk:58,def:28,exp:2000,gold:2000,px:6,sp:{n:'闇の波動',m:2.4,e:3,col:'#a030ff'},sp2:{n:'終焉の呪い',m:3,e:5,col:'#ff2a6a'},d:'魔王城に君臨する闇の王。その正体は…。',drop:['elixir',.6]}
+};
+const TRAIT={double:'2回攻撃することがある',evade:'素早く攻撃をかわす',poison:'毒を与える',drain:'HPを吸収する',heavy:'力を溜めて強攻撃を放つ'};
+
+/* 職業とスキル */
+const JOBS={
+sword:{n:'剣士',d:'通常攻撃が強力。攻撃力が高く、剣技で押し切る。',hp:62,mp:14,atk:9,def:4,g:{hp:9,mp:1.5,atk:2.6,def:1.2},basic:1.3,red:.5,col:'#4a7cff'},
+mage:{n:'魔法使い',d:'魔法スキルが強力。MPが多く、敵の防御を貫く。',hp:46,mp:30,atk:6,def:3,g:{hp:7,mp:3.5,atk:1.7,def:.9},basic:.9,red:.5,col:'#a45cff'},
+guard:{n:'守護者',d:'防御と回復が得意。守りで耐えて立て直す。',hp:75,mp:18,atk:7,def:6,g:{hp:11,mp:2,atk:1.8,def:1.9},basic:1,red:.7,col:'#e0c040'}
+};
+const SK=[
+{id:'s1',job:'sword',n:'強斬',cost:0,lv:1,mp:3,k:'dmg',m:1.9,fx:'slash',d:'力を込めた一撃(威力1.9倍)'},
+{id:'s2',job:'sword',n:'剣気',cost:1,lv:3,req:'s1',k:'pas',atk:.15,d:'ATK+15%(パッシブ)'},
+{id:'s3',job:'sword',n:'疾風連斬',cost:2,lv:6,req:'s2',mp:7,k:'dmg',m:3,fx:'slash',d:'風のような連続斬り(威力3倍)'},
+{id:'s4',job:'sword',n:'英雄の一撃',cost:3,lv:11,req:'s3',mp:12,k:'dmg',m:4.8,fx:'burst',d:'渾身の必殺剣(威力4.8倍)'},
+{id:'m1',job:'mage',n:'ファイア',cost:0,lv:1,mp:4,k:'dmg',m:2.4,pierce:.5,fx:'fire',d:'炎の魔法。防御を半分無視(2.4倍)'},
+{id:'m2',job:'mage',n:'魔力集中',cost:1,lv:3,req:'m1',k:'pas',mpm:.2,atk:.1,d:'最大MP+20% ATK+10%(パッシブ)'},
+{id:'m3',job:'mage',n:'サンダー',cost:2,lv:6,req:'m2',mp:8,k:'dmg',m:3.8,pierce:.5,fx:'bolt',d:'雷撃。防御を半分無視(3.8倍)'},
+{id:'m4',job:'mage',n:'メテオ',cost:3,lv:11,req:'m3',mp:16,k:'dmg',m:6,pierce:.6,fx:'fire',d:'隕石を降らせる大魔法(6倍)'},
+{id:'g1',job:'guard',n:'ヒール',cost:0,lv:1,mp:4,k:'heal',base:30,r:.15,fx:'heal',d:'HPを回復する'},
+{id:'g2',job:'guard',n:'鉄壁',cost:1,lv:3,req:'g1',k:'pas',def:.2,d:'DEF+20%(パッシブ)'},
+{id:'g3',job:'guard',n:'シールドバッシュ',cost:2,lv:6,req:'g2',mp:6,k:'dmg',m:1.7,useDef:1,fx:'burst',d:'攻撃+防御で殴る(1.7倍)'},
+{id:'g4',job:'guard',n:'聖なる光',cost:3,lv:11,req:'g3',mp:12,k:'heal',base:60,r:.45,cure:1,fx:'heal',d:'大回復+毒を治す'},
+{id:'c1',job:'any',n:'気合',cost:2,lv:4,k:'pas',hpm:.1,d:'最大HP+10%(パッシブ)'},
+{id:'c2',job:'any',n:'幸運の加護',cost:2,lv:8,req:'c1',k:'pas',luck:1,d:'レア発見率アップ(パッシブ)'}
+];
+const SKM={};SK.forEach(s=>SKM[s.id]=s);
+
+/* エリア */
+const AREAS={
+town:{n:'はじまりの町',ic:'🏘',rec:'-',d:'冒険者たちの拠点。'},
+forest:{n:'緑の森',ic:'🌲',rec:'Lv1-5',need:6,d:'木々が生い茂る穏やかな森。魔物の気配が漂う。',
+ mon:[['slime',4],['goblin',3],['bat',2],['wolf',2],['mushroom',2]],boss:'goblinking',
+ flav:['茂みがガサガサと揺れた！','木陰から何かが飛び出した！','足元で何かが動いた！'],
+ loot:{c:['potion','herb','ether','antidote','jelly'],r:['hipotion','bangle','chain','seed_hp'],e:['scale'],l:[]},gold:[12,35],
+ extra:['ore',.04],lore:['l1'],lock:'最初から解放済み'},
+cave:{n:'忘れられた洞窟',ic:'🕳',rec:'Lv5-10',need:8,d:'冷たい風が吹き抜ける暗い洞窟。奥に何かが眠っている。',
+ mon:[['spider',3],['skeleton',3],['ghost',2],['golem',2],['bat',2,1.7]],boss:'guardian',
+ flav:['闇の中で赤い目が光った！','天井から物音が降ってきた！','岩陰から気配が近づく！'],
+ loot:{c:['potion','hipotion','ether','antidote','ore','bone'],r:['chain','plate','pendant','seed_atk','seed_def','rod2'],e:['dragon_fang','star_staff','scale'],l:[]},gold:[35,90],
+ extra:['frag',.12],lore:['l3'],lock:'緑の森のボス撃破で解放'},
+castle:{n:'古代の廃城',ic:'🏰',rec:'Lv10-16',need:10,d:'朽ちた城に亡霊たちが彷徨う。書庫に秘密がありそうだ。',
+ mon:[['skeleton',2,2],['darkknight',3],['ghost',2,2.2],['wyvern',3],['golem',1,1.8]],boss:'dragon',
+ flav:['冷たい霧の中から鎧の音が響く！','崩れた壁の向こうに影が揺れる！','広間の灯りが突然消えた！'],
+ loot:{c:['hipotion','megapotion','ether','ore','bone'],r:['plate','pendant','clover','steel_sword','seed_atk','seed_def','seed_hp','seed_mp'],e:['mithril','dragon_fang','star_staff','scale'],l:['emblem']},gold:[90,200],
+ lore:['l5'],lock:'クエスト「光る欠片を集めよ」達成で解放'},
+demon:{n:'魔王の城',ic:'🌋',rec:'Lv16-24',need:12,d:'暗黒の雷が降る最終決戦の地。玉座に何者かが待つ。',
+ mon:[['darkknight',3,1.5],['wyvern',3,1.5],['golem',2,2.2],['ghost',2,3],['skeleton',2,2.7]],boss:'demon',
+ flav:['雷鳴とともに魔物が立ちはだかる！','城の回廊に殺気が満ちる！','闇の中から咆哮が響いた！'],
+ loot:{c:['megapotion','elixir','ether','ore'],r:['plate','steel_sword','clover','seed_atk','seed_def','seed_hp','seed_mp'],e:['mithril','dragon_fang','star_staff','scale'],l:['excalibur','aegis','emblem']},gold:[200,420],
+ lore:['l7'],lock:'古代の廃城のボス撃破で解放'}
+};
+const AORDER=['town','forest','cave','castle','demon'];
+const NEXTA={forest:'cave',castle:'demon'};
+
+/* 古文書(魔王の秘密) */
+const LORE={
+l1:'【森の石碑】『闇が地の底より溢れしとき、一人の勇者が現れ、世界を救えり』…その名は削られて読めない。',
+l2:'【王の首飾り】ゴブリンキングの首飾りには古い王国の紋章が刻まれていた。魔物たちは何者かの"命令"で、町への道を塞いでいたようだ。',
+l3:'【洞窟の壁画】勇者は闇を恐れた人々から、いつしか「魔王」と呼ばれるようになった――そう読める壁画が残されている。',
+l4:'【守護者の核】ゴーレムの核には命令文が刻まれていた。『封印を守れ。それが魔王様の最後の命令』。魔物は世界を襲うためではなく、封印を守るために動いていた。',
+l5:'【書庫の日記】勇者アークは世界を蝕む"闇"を、己の身に封じ込めた。その代償に、姿も心も少しずつ変わっていったという。',
+l6:'【竜の言葉】古竜は語った。「我らは魔王に従うのではない。主が闇に呑まれぬよう、扉を閉ざしているのだ」',
+l7:'【玉座の碑文】ダンジョンの封印は、人を魔物から守るためではなく、闇が外へ漏れぬよう張られた結界だった。',
+l8:'【魔王の最期の言葉】「…ようやく来たか。闇の核を砕けるのは、人の意志を持つ者だけだ。頼む、私を終わらせてくれ。」'
+};
+const LORE_ORDER=['l1','l2','l3','l4','l5','l6','l7','l8'];
+const BOSS_LORE={goblinking:'l2',guardian:'l4',dragon:'l6',demon:'l8'};
+
+/* クエスト */
+const Q=[
+{id:'q1',n:'スライム退治',d:'スライムを5体倒す',ty:'kill',tg:'slime',cnt:5,area:'forest',rw:{exp:40,gold:60,items:{potion:2}}},
+{id:'q2',n:'ゴブリン討伐',d:'ゴブリンを5体倒す',ty:'kill',tg:'goblin',cnt:5,area:'forest',rw:{exp:70,gold:100,items:{charm:1}}},
+{id:'q3',n:'森の宝探し',d:'宝箱を3個見つける',ty:'chest',cnt:3,area:'forest',rw:{exp:60,gold:80,items:{potion:3}}},
+{id:'q4',n:'薬草集め',d:'薬草を5個集めて納品',ty:'collect',tg:'herb',cnt:5,area:'forest',rw:{exp:40,gold:70,items:{ether:2}}},
+{id:'q5',n:'森の奥へ',d:'緑の森の最深部まで踏破する',ty:'depth',tg:'forest',cnt:1,area:'forest',rw:{exp:80,gold:100,items:{antidote:3}}},
+{id:'q6',n:'森の主を倒せ',d:'ゴブリンキングを倒す',ty:'boss',tg:'goblinking',cnt:1,area:'forest',rw:{exp:150,gold:300,items:{hipotion:2,seed_hp:1}}},
+{id:'q7',n:'コウモリ退治',d:'コウモリを6体倒す',ty:'kill',tg:'bat',cnt:6,area:'forest',rw:{exp:60,gold:90,items:{atk_tonic:2}}},
+{id:'q8',n:'光る欠片を集めよ',d:'光る欠片を3個集めて納品(古代の廃城への道が開く)',ty:'collect',tg:'frag',cnt:3,area:'cave',ul:'castle',rw:{exp:300,gold:300,items:{hipotion:3}}},
+{id:'q9',n:'洞窟踏破',d:'忘れられた洞窟の最深部まで踏破する',ty:'depth',tg:'cave',cnt:1,area:'cave',rw:{exp:220,gold:200,items:{def_tonic:2}}},
+{id:'q10',n:'骸骨狩り',d:'スケルトンを8体倒す',ty:'kill',tg:'skeleton',cnt:8,area:'cave',rw:{exp:250,gold:250,items:{pendant:1}}},
+{id:'q11',n:'鉱石採取',d:'鉱石を4個集めて納品',ty:'collect',tg:'ore',cnt:4,area:'cave',rw:{exp:150,gold:150,items:{seed_def:1}}},
+{id:'q12',n:'守護者を倒せ',d:'守護ゴーレムを倒す',ty:'boss',tg:'guardian',cnt:1,area:'cave',rw:{exp:500,gold:600,items:{elixir:1,seed_atk:1}}},
+{id:'q13',n:'古城の宝物庫',d:'宝箱を8個見つける',ty:'chest',cnt:8,area:'castle',rw:{exp:500,gold:500,items:{megapotion:2}}},
+{id:'q14',n:'古城踏破',d:'古代の廃城の最深部まで踏破する',ty:'depth',tg:'castle',cnt:1,area:'castle',rw:{exp:600,gold:500,items:{seed_mp:1}}},
+{id:'q15',n:'竜を討て',d:'古竜ドラゴンを倒す',ty:'boss',tg:'dragon',cnt:1,area:'castle',rw:{exp:1500,gold:1500,items:{scale:1,elixir:2}}},
+{id:'q16',n:'魔王討伐',d:'魔王を倒す',ty:'boss',tg:'demon',cnt:1,area:'demon',rw:{exp:4000,gold:3000,items:{elixir:3,seed_atk:2,seed_def:2}}},
+{id:'q17',n:'魔物ハンター',d:'魔物を合計30体倒す',ty:'kill',tg:'*',cnt:30,area:'forest',rw:{exp:200,gold:200,items:{hipotion:2}}},
+{id:'q18',n:'探索の達人',d:'ダンジョンを合計30回探索する',ty:'explore',cnt:30,area:'forest',rw:{exp:180,gold:180,items:{ring_pow:1}}}
+];
+const QM={};Q.forEach(q=>QM[q.id]=q);
+const DAILY_T=[
+{k:'kill',t:n=>`魔物を${n}体倒す`,r:[4,8]},
+{k:'chest',t:n=>`宝箱を${n}個見つける`,r:[1,3]},
+{k:'explore',t:n=>`ダンジョンを${n}回探索する`,r:[4,8]},
+{k:'skill',t:n=>`スキルを${n}回使う`,r:[3,6]},
+{k:'item',t:n=>`回復アイテムを${n}個使う`,r:[1,3]}
+];
+
+/* 実績 */
+const ACH=[
+{id:'a1',n:'初めて敵を倒した',ti:'駆け出し冒険者',t:()=>S.st.kills>=1,rw:{gold:50}},
+{id:'a2',n:'初めてレベルアップした',ti:'成長の兆し',t:()=>S.lv>=2,rw:{gold:50,items:{potion:2}}},
+{id:'a3',n:'10種類のモンスターを発見した',ti:'魔物博士',t:()=>Object.keys(S.dex).length>=10,rw:{gold:300,items:{ether:3}}},
+{id:'a4',n:'初めてボスを倒した',ti:'ボスハンター',t:()=>S.st.bosses>=1,rw:{gold:200,items:{hipotion:3}}},
+{id:'a5',n:'レジェンド装備を獲得した',ti:'伝説の継承者',t:()=>!!S.flags.legend,rw:{gold:1000,items:{elixir:1}}},
+{id:'a6',n:'全エリアを解放した',ti:'世界の開拓者',t:()=>AORDER.every(a=>S.unlocked[a]),rw:{gold:800,items:{elixir:1}}},
+{id:'a7',n:'宝箱を10個見つけた',ti:'宝探し人',t:()=>S.st.chests>=10,rw:{gold:150}},
+{id:'a8',n:'レベル10に到達した',ti:'熟練の冒険者',t:()=>S.lv>=10,rw:{gold:400,items:{hipotion:3}}},
+{id:'a9',n:'クエストを5つ達成した',ti:'頼れる冒険者',t:()=>Object.keys(S.quests.done).length>=5,rw:{gold:300}},
+{id:'a10',n:'全ての魔物を討伐した',ti:'魔物マスター',t:()=>Object.keys(MON).every(m=>S.dex[m]&&S.dex[m].k>0),rw:{gold:1500,items:{seed_atk:1,seed_def:1}}},
+{id:'a11',n:'魔王の秘密を解き明かした',ti:'真実を知る者',t:()=>LORE_ORDER.every(l=>S.lore[l]),rw:{gold:1000,items:{elixir:2}}},
+{id:'a12',n:'魔王を倒した',ti:'魔王を超えし者',t:()=>!!S.flags.cleared,rw:{gold:3000,items:{megapotion:5}}},
+{id:'a13',n:'休息日も立派な冒険',ti:'ゆったり旅人',t:()=>Object.keys(S.rest).length>=1,rw:{gold:100,items:{potion:2}}}
+];
+
+/* 筋トレ種目(任意サブシステム) */
+const EX={
+pushup:{n:'腕立て伏せ',u:'回',f:.4},
+pullup:{n:'懸垂',u:'回',f:1.2},
+dbpress:{n:'ダンベルプレス',u:'回',f:.8,w:1},
+dbcurl:{n:'ダンベルカール',u:'回',f:.6,w:1},
+plank:{n:'プランク',u:'秒',f:.1},
+squat:{n:'スクワット',u:'回',f:.3}
+};
+const TCAP=100;
+
+/* ============ 状態管理 ============ */
+let S=null;
+const needExp=lv=>Math.round(8*Math.pow(lv,1.7));
+const MAXLV=30;
+function newState(name,job){
+  const s={ver:1,name:name||'ユウ',job:job||'sword',lv:1,exp:0,sp:0,hp:1,mp:1,gold:100,
+    bonus:{hp:0,mp:0,atk:0,def:0},skills:{},inv:{potion:3,wood_sword:1,cloth:1},
+    eq:{weapon:'wood_sword',armor:'cloth',acc:null},enh:{},loc:'town',
+    unlocked:{town:true,forest:true},prog:{},astat:{},bossDone:{},dex:{},
+    quests:{active:{},done:{}},daily:{date:'',list:[]},
+    train:[],rest:{},tclaim:{},ach:{},titles:['見習い冒険者'],title:'見習い冒険者',lore:{},found:{},
+    st:{kills:0,chests:0,explores:0,battles:0,bosses:0,flee:0,deaths:0,skillUses:0,itemUses:0,gold:0},
+    flags:{},saved:0,created:Date.now()};
+  SK.forEach(k=>{if(k.job===s.job&&k.cost===0)s.skills[k.id]=1});
+  return s;
+}
+function merge(d,s){
+  if(Array.isArray(d)||typeof d!=='object'||d===null)return (s!==undefined&&typeof s===typeof d)?s:d;
+  const o=Object.assign({},d);
+  if(typeof s!=='object'||s===null)return o;
+  for(const k of Object.keys(s)){
+    if(k in d&&!Array.isArray(d[k])&&typeof d[k]==='object'&&d[k]!==null)o[k]=merge(d[k],s[k]);
+    else o[k]=s[k];
+  }
+  return o;
+}
+function sanitize(){
+  const m=stats();
+  S.hp=clamp(Math.floor(S.hp)||1,1,m.hp);S.mp=clamp(Math.floor(S.mp)||0,0,m.mp);
+  S.lv=clamp(S.lv|0||1,1,MAXLV);S.gold=Math.max(0,S.gold|0);
+  if(!AREAS[S.loc]||!S.unlocked[S.loc])S.loc='town';
+  S.unlocked.town=true;S.unlocked.forest=true;
+  for(const k of Object.keys(S.inv))if(!IT[k]||S.inv[k]<=0)delete S.inv[k];
+  for(const sl of ['weapon','armor','acc']){const id=S.eq[sl];if(id&&(!IT[id]||!S.inv[id]))S.eq[sl]=null}
+}
+function stats(){
+  const j=JOBS[S.job],lv=S.lv,g=j.g;
+  let hp=j.hp+g.hp*(lv-1)+S.bonus.hp,mp=j.mp+g.mp*(lv-1)+S.bonus.mp,atk=j.atk+g.atk*(lv-1)+S.bonus.atk,def=j.def+g.def*(lv-1)+S.bonus.def,luck=0;
+  for(const sl of ['weapon','armor','acc']){
+    const it=IT[S.eq[sl]];if(!it)continue;const e=S.enh[it.id]||0;
+    if(it.atk)atk+=it.atk+e*(1+Math.floor(it.atk*.1));
+    if(it.def)def+=it.def+e*(1+Math.floor(it.def*.1));
+    if(it.t!=='acc'&&e&&it.t==='armor')hp+=e*4;
+    hp+=it.hp||0;mp+=it.mp||0;luck+=it.luck||0;
+  }
+  let am=1,dm=1,hm=1,mm=1;
+  for(const id of Object.keys(S.skills)){const k=SKM[id];if(!k||k.k!=='pas')continue;am+=k.atk||0;dm+=k.def||0;hm+=k.hpm||0;mm+=k.mpm||0;luck+=k.luck||0}
+  return {hp:Math.floor(hp*hm),mp:Math.floor(mp*mm),atk:Math.floor(atk*am),def:Math.floor(def*dm),luck};
+}
+function gainExp(n){
+  const lines=[];if(n<=0)return lines;
+  S.exp+=n;
+  while(S.lv<MAXLV&&S.exp>=needExp(S.lv)){
+    S.exp-=needExp(S.lv);
+    const b=stats();S.lv++;S.sp++;
+    const a=stats();
+    S.hp=Math.min(a.hp,S.hp+Math.floor(a.hp*.3)+(a.hp-b.hp));S.mp=Math.min(a.mp,S.mp+Math.floor(a.mp*.3)+(a.mp-b.mp));
+    lines.push(`<span class="hl">★レベルアップ！ Lv${S.lv}</span> HP+${a.hp-b.hp} MP+${a.mp-b.mp} ATK+${a.atk-b.atk} DEF+${a.def-b.def} SP+1`);
+    levelFx();
+  }
+  if(S.lv>=MAXLV)S.exp=Math.min(S.exp,needExp(MAXLV)-1);
+  return lines;
+}
+
+/* ============ セーブ ============ */
+const SLOTS=[['auto','オートセーブ'],['1','スロット1'],['2','スロット2']];
+const skey=sl=>'tq_save_'+sl;
+function storeOK(){try{localStorage.setItem('tq_t','1');localStorage.removeItem('tq_t');return true}catch(e){return false}}
+function writeSave(sl){
+  if(!S)return false;
+  try{
+    S.saved=Date.now();
+    const k=skey(sl),old=localStorage.getItem(k);
+    if(old)localStorage.setItem(k+'_bak',old);
+    localStorage.setItem(k,JSON.stringify({ver:1,t:S.saved,s:S}));
+    return true;
+  }catch(e){return false}
+}
+function readSave(sl){
+  for(const k of [skey(sl),skey(sl)+'_bak']){
+    try{const raw=localStorage.getItem(k);if(!raw)continue;const d=JSON.parse(raw);if(d&&d.s&&JOBS[d.s.job])return d}catch(e){}
+  }
+  return null;
+}
+function loadSlot(sl){
+  const d=readSave(sl);if(!d)return false;
+  S=merge(newState(d.s.name,d.s.job),d.s);sanitize();return true;
+}
+function newestSlot(){
+  let best=null,bt=-1;
+  for(const [sl] of SLOTS){const d=readSave(sl);if(d&&(d.t||0)>bt){bt=d.t||0;best=sl}}
+  return best;
+}
+const autosave=()=>writeSave('auto');
+const SET={m:.7,b:.5,s:.7,mute:false,calm:false};
+function saveSet(){try{localStorage.setItem('tq_settings',JSON.stringify(SET))}catch(e){}}
+function loadSet(){try{const d=JSON.parse(localStorage.getItem('tq_settings')||'null');if(d)Object.assign(SET,d)}catch(e){}}
+
+/* ============ サウンド(Web Audio生成) ============ */
+const midi=m=>440*Math.pow(2,(m-69)/12);
+const BGM={
+town:{ms:300,w:'triangle',mel:[72,0,76,0,79,0,76,0,74,0,77,0,81,0,77,0,72,0,76,0,79,0,83,0,81,0,79,0,76,0,0,0],bas:[48,0,0,0,52,0,0,0,50,0,0,0,53,0,0,0]},
+dungeon:{ms:340,w:'square',mel:[69,0,0,72,0,0,71,0,67,0,0,64,0,0,0,0,69,0,0,72,0,0,76,0,74,0,0,71,0,0,0,0],bas:[45,0,0,0,0,0,0,0,43,0,0,0,0,0,0,0]},
+battle:{ms:170,w:'square',mel:[69,69,0,72,69,0,76,0,74,74,0,72,71,0,67,0],bas:[45,0,45,0,43,0,43,0,41,0,41,0,43,0,43,0]},
+boss:{ms:140,w:'sawtooth',mel:[64,0,67,64,71,0,70,0,64,0,67,64,72,0,71,0,62,0,65,62,69,0,68,0,62,0,65,62,70,0,69,0],bas:[40,40,0,40,40,0,40,0,38,38,0,38,38,0,38,0]},
+ending:{ms:320,w:'triangle',mel:[72,0,76,79,0,84,0,83,79,0,76,0,74,0,72,0],bas:[48,0,55,0,52,0,55,0]}
+};
+const Snd={ctx:null,mode:null,step:0,timer:null,
+  init(){if(this.ctx)return;try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;this.ctx=new C();
+    this.m=this.ctx.createGain();this.b=this.ctx.createGain();this.s=this.ctx.createGain();this.b.connect(this.m);this.s.connect(this.m);this.m.connect(this.ctx.destination);this.apply()}catch(e){this.ctx=null}},
+  apply(){if(!this.ctx)return;this.m.gain.value=SET.mute?0:SET.m;this.b.gain.value=SET.b*.3;this.s.gain.value=SET.s*.6},
+  resume(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume()},
+  tone(f,d,type,v,dest,slide,delay){
+    if(!this.ctx||SET.mute)return;
+    try{const c=this.ctx,t=c.currentTime+(delay||0),o=c.createOscillator(),g=c.createGain();
+    o.type=type||'square';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+d);
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.3,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(dest||this.s);o.start(t);o.stop(t+d+.05)}catch(e){}
+  },
+  noise(d,v,delay){
+    if(!this.ctx||SET.mute)return;
+    try{const c=this.ctx,n=Math.floor(c.sampleRate*d),buf=c.createBuffer(1,n,c.sampleRate),dat=buf.getChannelData(0);
+    for(let i=0;i<n;i++)dat[i]=(Math.random()*2-1)*(1-i/n);
+    const s=c.createBufferSource(),g=c.createGain();s.buffer=buf;g.gain.value=v||.3;s.connect(g);g.connect(this.s);s.start(c.currentTime+(delay||0))}catch(e){}
+  },
+  sfx(n){
+    if(!this.ctx)return;this.resume();
+    switch(n){
+      case 'click':this.tone(660,.06,'square',.2);break;
+      case 'hit':this.noise(.12,.5);this.tone(180,.1,'sawtooth',.3,null,60);break;
+      case 'crit':this.noise(.2,.6);this.tone(880,.15,'square',.3,null,200);break;
+      case 'hurt':this.tone(220,.22,'sawtooth',.35,null,70);this.noise(.1,.3);break;
+      case 'heal':[523,659,784,1047].forEach((f,i)=>this.tone(f,.15,'triangle',.3,null,0,i*.07));break;
+      case 'magic':this.tone(300,.4,'sine',.35,null,1400);this.noise(.25,.2,.1);break;
+      case 'levelup':[523,659,784,1047,1319].forEach((f,i)=>this.tone(f,.2,'square',.25,null,0,i*.1));break;
+      case 'win':[523,523,523,659,587,784].forEach((f,i)=>this.tone(f,.18,'square',.25,null,0,i*.12));break;
+      case 'lose':[392,349,330,262].forEach((f,i)=>this.tone(f,.3,'triangle',.35,null,0,i*.22));break;
+      case 'chest':[784,988,1175,1568].forEach((f,i)=>this.tone(f,.12,'square',.2,null,0,i*.06));break;
+      case 'gold':this.tone(1319,.06,'square',.2);this.tone(1760,.12,'square',.2,null,0,.06);break;
+      case 'boss':this.tone(110,.9,'sawtooth',.5,null,50);this.noise(.5,.4);break;
+      case 'err':this.tone(130,.15,'square',.25);break;
+      case 'step':this.tone(110,.05,'triangle',.15);break;
+      case 'ach':[784,1047,1319].forEach((f,i)=>this.tone(f,.2,'triangle',.3,null,0,i*.1));break;
+    }
+  },
+  bgm(mode){
+    if(this.mode===mode)return;this.mode=mode;this.step=0;clearInterval(this.timer);
+    if(!mode)return;this.timer=setInterval(()=>this.tick(),BGM[mode].ms);
+  },
+  tick(){
+    if(!this.ctx||SET.mute||this.ctx.state!=='running')return;
+    const p=BGM[this.mode];if(!p)return;const i=this.step++,m=p.mel[i%p.mel.length],bb=p.bas[i%p.bas.length];
+    if(m)this.tone(midi(m),p.ms/1000*1.6,p.w,.5,this.b);
+    if(bb)this.tone(midi(bb),p.ms/1000*3,'triangle',.8,this.b);
+  }
+};
+const sfx=n=>Snd.sfx(n);
+
+/* ============ ピクセル描画 ============ */
+const SPR={
+slime:["............","............","....oooo....","..ooaaaaoo..",".oaacaaaaao.",".oacaaaaaao.",".oaawoaowao.",".oaaaaaaaabo","oabaaaaaabbo","obbbbbbbbbbo",".oooooooooo.","............"],
+hum:["............","...oooooo...","..ohhhhhho..","..ocecceco..","..occccco...","...oooooo...","..oaaaaaao..",".ocaaaaaaco.",".ocabbbbaco.","..oaaooaao..","..obbo.obbo.","..oooo.oooo."],
+bat:["............","o..........o","oo...oo...oo","obo.oaao.obo","obboaaaaobbo","obbbaeaebbbo",".obbbaaabbo.","..oboaaaobo.","...o.ooo.o..","............"],
+beast:["............","o.o.........","oao.....oo..","oaaoooooaao.","oaeaaaaaaabo","owaaaaaaabbo",".ooaaaaaabbo","..oaaaaabbo.","..oaoooaoao.","..oao..oao..","..ooo..ooo.."],
+mush:["....oooo....","..ooaaaaoo..",".oaawaaawao.",".oaaaabaaao.","oaaaaaaaaaao",".oooooooooo.","...oecceo...","...occcco...","...occcco...","...obbbbo...","...oooooo..."],
+spider:["............","o....oo....o",".o..oaao..o.","..oooaaooo..","o.oaeaaeao.o",".ooaaaaaaoo.","o.oabbbbao.o","..oaaaaaao..",".o..oooo..o.","o..........o"],
+golem:["...oooooo...","..occcccco..","..ocecceco..","..occcccco..",".ooaaaaaaoo.","ocaaaaaaaaco","ocabbaabbaco","ocaaaaaaaaco",".ooaaaaaaoo.","..oaaoaaao..","..obbo.obbo.","..oooo.oooo."],
+dragon:["........oo..","..oo...oaao.",".oaao.oaaao.","oaeaaoaaaaoo","oaaaaaaaabbo",".ooccccaabbo","..occccaabo.","..oaaaaabbo.",".oaabboabbo.",".oao.oao.oo.",".ooo.ooo...."],
+ghost:["....oooo....","..ooaaaaoo..",".oaaaaaaaao.",".oaeaaaeaao.",".oaaaoooaao.",".oaaaaaaaao.",".oaaaaaaaao.",".oaaaaaaaao.",".oabaaabaao.","..o.oaao.o..","............"],
+demon:["o..........o","oo.oooooo.oo",".ooo aaaa ooo.".replace(/ /g,''),"..ocecceco..","..occcccco..",".ooaooooaoo.","oabaaaaaabao","oabbaaaabbao",".oaabbbbaao.","..oaa..aao..","..obb..bbo..","..ooo..ooo.."]
+};
+const cv=$('#cv'),g=cv.getContext('2d');g.imageSmoothingEnabled=false;
+const CW=192,CH=108;
+function rect(x,y,w,h,c){g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)))}
+function drawSpr(rows,pal,x,y,sc,flip,ctx){
+  const gg=ctx||g,col=Object.assign({o:'#10101c',w:'#ffffff',k:'#000',r:'#ff4a4a',y:'#ffd24a'},pal);
+  const wd=rows.reduce((m,r)=>Math.max(m,r.length),0);
+  for(let j=0;j<rows.length;j++){const r=rows[j];for(let i=0;i<r.length;i++){
+    const c=col[r[i]];if(r[i]==='.'||!c)continue;
+    gg.fillStyle=c;gg.fillRect(Math.round(x+(flip?(wd-1-i):i)*sc),Math.round(y+j*sc),sc,sc)}}
+}
+const sprH=(id)=>SPR[MON[id].sh].length;
+function seeded(n){let s=n*9301+49297;return()=>{s=(s*9301+49297)%233280;return s/233280}}
+const STARS=(()=>{const r=seeded(7),a=[];for(let i=0;i<45;i++)a.push([Math.floor(r()*CW),Math.floor(r()*60),r()*6]);return a})();
+function grad(c1,c2,y0,y1){
+  const h=(c)=>[parseInt(c.slice(1,3),16),parseInt(c.slice(3,5),16),parseInt(c.slice(5,7),16)];
+  const a=h(c1),b=h(c2);
+  for(let y=y0;y<y1;y+=3){const t=(y-y0)/(y1-y0);rect(0,y,CW,3,`rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')})`)}
+}
+function stars(t,n){for(let i=0;i<Math.min(n||45,STARS.length);i++){const s=STARS[i];if(Math.sin(t/500+s[2])>-.5)rect(s[0],s[1],1,1,'#cfd8ff')}}
+function moon(x,y,r,c){for(let j=-r;j<=r;j++){const w=Math.floor(Math.sqrt(r*r-j*j));rect(x-w,y+j,w*2+1,1,c)}}
+function pine(x,b,h,c){for(let i=0;i<h;i+=3){const w=Math.max(2,Math.round((h-i)/3.2));rect(x-w,b-h+i,w*2+1,3,c)}rect(x-1,b,3,3,'#1a1008')}
+function bgTown(t){
+  grad('#0b0b30','#3a2a6a',0,80);stars(t);moon(160,18,8,'#e8e8ff');moon(163,16,7,'#c8c8f0');
+  const r=seeded(3);
+  for(let i=0;i<7;i++){const x=i*28-4,h=20+Math.floor(r()*18);
+    rect(x,84-h,22,h,'#16163a');rect(x-2,84-h-4,26,5,'#2a1a4a');rect(x+10,84-h-9,2,5,'#2a1a4a');
+    for(let k=0;k<2;k++){const on=Math.sin(t/900+i*2+k)>-.7;rect(x+4+k*10,84-h+6,5,5,on?'#ffd24a':'#2a2a55')}}
+  rect(0,84,CW,24,'#14142e');rect(0,84,CW,2,'#2e2e66');
+  for(let i=0;i<10;i++)rect(i*20+4,92+(i%2)*6,8,2,'#1d1d44');
+}
+function bgForest(t){
+  grad('#050d18','#0c2a2a',0,84);stars(t,25);moon(30,16,6,'#b8e8d8');
+  const r=seeded(11);
+  for(let i=0;i<9;i++)pine(i*24+5,78,44+Math.floor(r()*14),'#0a2a20');
+  for(let i=0;i<8;i++)pine(i*26+14,86,52+Math.floor(r()*14),'#0e3a2a');
+  rect(0,86,CW,22,'#0a2418');rect(0,86,CW,2,'#1a5a3a');
+  for(let i=0;i<10;i++){const x=(i*47+t/40*((i%3)+1)/2)%CW,y=50+Math.sin(t/600+i)*18+i*3;if(Math.sin(t/300+i*3)>-.4){rect(x,y,2,2,'#c8ff7a');rect(x-1,y,4,1,'rgba(200,255,120,.3)')}}
+}
+function bgCave(t){
+  grad('#0a0614','#1a1038',0,90);
+  const r=seeded(5);
+  for(let i=0;i<14;i++){const x=i*14+Math.floor(r()*6),h=8+Math.floor(r()*22);for(let k=0;k<h;k+=3)rect(x-Math.round((h-k)/6),k,Math.max(2,Math.round((h-k)/3)),3,'#241a44')}
+  rect(0,86,CW,22,'#150e2a');rect(0,86,CW,2,'#3a2a6a');
+  for(let i=0;i<6;i++){const x=i*34+10,p=.6+.4*Math.sin(t/500+i),c=i%2?'#6a8aff':'#b46bff';
+    rect(x,78,3,8,c);rect(x-2,80,2,6,c);rect(x+3,81,2,5,c);g.globalAlpha=.25*p;rect(x-6,70,16,16,c);g.globalAlpha=1}
+}
+function bgCastle(t){
+  grad('#0a0820','#2a1a44',0,84);stars(t);moon(150,22,10,'#e0dcff');
+  const r=seeded(9);
+  for(let i=0;i<6;i++){const x=i*34-6,h=26+Math.floor(r()*26);rect(x,84-h,24,h,'#120e28');
+    for(let k=0;k<3;k++)rect(x+k*9,84-h-4,5,5,'#120e28');rect(x+9,84-h+8,5,9,'#05031a')}
+  rect(0,84,CW,24,'#0e0a20');rect(0,84,CW,2,'#2a2060');
+  for(let i=0;i<4;i++){const x=(i*60+t/50)%CW;g.globalAlpha=.12;rect(x-20,78+i*2,50,5,'#9ab0ff');g.globalAlpha=1}
+  for(let i=0;i<3;i++){const x=30+i*70,y=64+Math.sin(t/400+i*2)*5;rect(x,y,3,4,'#6aff9a');g.globalAlpha=.3;rect(x-2,y-2,7,8,'#6aff9a');g.globalAlpha=1}
+}
+function bgDemon(t){
+  grad('#1a0612','#5a1a3a',0,84);
+  const fl=(Math.floor(t/1700)%3===0&&(t%1700)<140);if(fl)rect(0,0,CW,60,'rgba(255,200,255,.25)');
+  const r=seeded(13);
+  for(let i=0;i<7;i++){const x=i*30-4,h=30+Math.floor(r()*34);rect(x+6,84-h,12,h,'#0e0414');rect(x+9,84-h-8,6,8,'#0e0414');rect(x+11,84-h-14,2,6,'#0e0414');rect(x+9,84-h+10,4,6,'#ff4a2a')}
+  rect(0,84,CW,24,'#1a0410');
+  for(let i=0;i<8;i++){const p=.5+.5*Math.sin(t/300+i);rect(i*26+3,90+(i%3)*5,16,3,`rgba(255,${Math.round(80+p*80)},30,.9)`)}
+  if(fl){const x=60+Math.floor(r()*70);for(let y=0;y<80;y+=6)rect(x+((y/6)%2?3:-3),y,2,7,'#fff0ff')}
+}
+function bgMap(t){
+  grad('#08081e','#1a1a4a',0,108);stars(t);
+  const pos={town:[28,78],forest:[66,52],cave:[108,70],castle:[140,34],demon:[168,70]};
+  g.strokeStyle='#3a3a90';g.lineWidth=2;g.setLineDash([3,3]);g.beginPath();
+  AORDER.forEach((a,i)=>{const p=pos[a];i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])});g.stroke();g.setLineDash([]);
+  AORDER.forEach(a=>{const p=pos[a],un=S&&S.unlocked[a],cur=S&&S.loc===a;
+    const col=un?{town:'#ffd24a',forest:'#4adf8a',cave:'#b46bff',castle:'#8aa0ff',demon:'#ff4a6a'}[a]:'#444466';
+    const pu=cur?Math.sin(t/200)*2:0;
+    rect(p[0]-6-pu,p[1]-6-pu,12+pu*2,12+pu*2,'#05051a');rect(p[0]-5,p[1]-5,10,10,col);
+    if(!un){rect(p[0]-2,p[1]-1,4,4,'#222');rect(p[0]-1,p[1]-4,2,3,'#888')}
+    if(cur){rect(p[0]-1,p[1]-14+pu,3,5,'#fff')}});
+}
+function bgTitle(t){
+  grad('#0a0620','#4a1a5a',0,90);stars(t);moon(96,36,16,'#f0e8ff');moon(100,33,14,'#d8d0f8');
+  const r=seeded(21);
+  for(let i=0;i<8;i++){const x=i*26-6,h=22+Math.floor(r()*30);rect(x,92-h,18,h,'#0a0418');rect(x+6,92-h-8,6,8,'#0a0418')}
+  rect(84,52,24,40,'#06020e');rect(80,48,8,12,'#06020e');rect(104,48,8,12,'#06020e');rect(92,40,8,14,'#06020e');
+  rect(94,62,4,6,'#ff4a6a');rect(0,92,CW,16,'#06020e');
+}
+const BGS={town:bgTown,forest:bgForest,cave:bgCave,castle:bgCastle,demon:bgDemon,map:bgMap,title:bgTitle};
+const PPAL={sword:{c:'#f0c8a0',a:'#4a7cff',b:'#2a4cb0',h:'#7a3a1a',e:'#222'},mage:{c:'#f0c8a0',a:'#8a4aff',b:'#5a2ab0',h:'#e0d0ff',e:'#222'},guard:{c:'#f0c8a0',a:'#d8b840',b:'#9a7a20',h:'#8a8a9a',e:'#222'}};
+function drawPlayer(x,y,t,hit){
+  const sc=3,bob=Math.round(Math.sin(t/350)),yy=y+bob;
+  drawSpr(SPR.hum,PPAL[S.job],x,yy,sc);
+  if(S.job==='sword'){rect(x+36,yy+6,3,15,'#d8d8f0');rect(x+34,yy+21,7,3,'#a07030');rect(x+36,yy+3,3,3,'#fff')}
+  else if(S.job==='mage'){rect(x+36,yy+4,3,26,'#7a4a20');rect(x+33,yy,9,6,'#6af0ff');rect(x+35,yy+1,5,3,'#fff')}
+  else{rect(x+33,yy+12,9,13,'#c0c0d8');rect(x+35,yy+14,5,9,'#d8b840');rect(x+37,yy+16,1,5,'#fff')}
+  if(hit>0){g.globalAlpha=.5;drawSpr(SPR.hum,{o:'#f55',c:'#f55',a:'#f55',b:'#f55',h:'#f55',e:'#f55'},x,yy,sc);g.globalAlpha=1}
+}
+let FX=[];
+const T0=performance.now();
+function fxAdd(type,tgt,col,dur){FX.push({type,tgt,col:col||'#fff',t0:performance.now(),dur:dur||450})}
+function drawFx(now){
+  FX=FX.filter(f=>now-f.t0<f.dur);
+  for(const f of FX){
+    const p=(now-f.t0)/f.dur,cx=f.tgt==='e'?135:55,cy=f.tgt==='e'?60:62;
+    switch(f.type){
+      case 'slash':for(let i=0;i<3;i++){const o=i*5-5,q=Math.min(1,p*2.2);for(let k=0;k<22*q;k++)rect(cx-14+k+o*0,cy-16+k*1.3+o,2,2,'#fff')}break;
+      case 'fire':{const r=4+p*22;g.globalAlpha=1-p;for(let i=0;i<14;i++){const a=i/14*6.28;rect(cx+Math.cos(a)*r,cy+Math.sin(a)*r,4,4,i%2?'#ff8a2a':'#ffd24a')}rect(cx-r/2,cy-r/2,r,r,'#ff5a1a');g.globalAlpha=1;break}
+      case 'bolt':{let x=cx,y=0;while(y<cy+10){const nx=cx+((y/6)%2?6:-6);rect(nx,y,3,7,'#fff68a');y+=6}g.globalAlpha=.6*(1-p);rect(cx-18,cy-18,36,36,'#fff68a');g.globalAlpha=1;break}
+      case 'burst':{const r=p*26;for(let i=0;i<10;i++){const a=i/10*6.28;rect(cx+Math.cos(a)*r,cy+Math.sin(a)*r,3,3,i%2?'#fff':f.col)}rect(cx-4,cy-4,8,8,'#fff');break}
+      case 'heal':for(let i=0;i<8;i++){const x=cx-16+i*5,y=cy+20-p*50-(i%3)*6;g.globalAlpha=1-p;rect(x,y,3,1,'#6aff9a');rect(x+1,y-1,1,3,'#6aff9a')}g.globalAlpha=1;break;
+      case 'breath':{g.globalAlpha=Math.min(1,2-p*2);for(let i=0;i<8;i++){const x=135-p*100*(0.6+i*.06),y=60+Math.sin(i*2+p*9)*(10+i*2);rect(x,y-6,34,12,i%2?f.col:'#fff')}g.globalAlpha=1;break}
+      case 'hit':g.globalAlpha=1-p;rect(cx-10,cy-10,20,20,'#fff');g.globalAlpha=1;break;
+    }
+  }
+}
+function drawScene(now){
+  if(!S&&ui.scr!=='title'&&ui.scr!=='newgame')return;
+  const t=now-T0;
+  g.clearRect(0,0,CW,CH);
+  let key='title';
+  if(S&&ui.scr!=='title'&&ui.scr!=='newgame'){key=ui.scr==='map'?'map':(ui.scr==='ending'?'demon':S.loc)}
+  (BGS[key]||bgTown)(t);
+  if(S&&ui.scr==='battle'&&B){
+    const e=B.e,m=MON[e.id],rows=SPR[m.sh],px=m.px,w=12*px,h=rows.length*px,bob=Math.round(Math.sin(t/260)*2);
+    const ex=Math.round(132-w/2+ (B.eshake>0?(Math.random()*4-2):0)),ey=92-h+bob+(e.hp<=0?6:0);
+    g.globalAlpha=m.sh==='ghost'?.8:1;
+    drawSpr(rows,m.pal,ex,ey,px,m.sh==='beast'||m.sh==='dragon'||m.sh==='bat'?false:false);
+    if(B.ehit>0){g.globalAlpha=.6;drawSpr(rows,{o:'#fff',a:'#fff',b:'#fff',c:'#fff',h:'#fff',e:'#fff',w:'#fff'},ex,ey,px)}
+    g.globalAlpha=1;
+    if(e.boss){g.globalAlpha=.25+.15*Math.sin(t/200);rect(ex-4,92,w+8,3,m.sp?m.sp.col:'#fff');g.globalAlpha=1}
+    drawPlayer(34,56,t,B.phit);
+    if(B.ehit>0)B.ehit--;if(B.phit>0)B.phit--;if(B.eshake>0)B.eshake--;
+  }else if(S&&!['title','newgame','map'].includes(ui.scr)){
+    drawPlayer(82,56,t,0);
+  }
+  drawFx(performance.now());
+}
+let lastDraw=0;
+function loop(ts){if(ts-lastDraw>32){lastDraw=ts;try{drawScene(ts)}catch(e){}}requestAnimationFrame(loop)}
+
+/* ============ UI基盤 ============ */
+let ui={scr:'title',log:[],tab:'equip',bm:'main',mode:'buy',stab:'weapon',job:'sword',dlg:null,res:null,next:null,tedit:null,mok:null,fromTitle:false,tre:false};
+let B=null,bid=0;
+const panel=$('#panel');
+const ACT={},SCR={};
+const say=t=>{ui.log.push(t);if(ui.log.length>7)ui.log.shift()};
+const logBox=()=>`<div class="log">${ui.log.map(l=>`<div>${l}</div>`).join('')||'<div>&nbsp;</div>'}</div>`;
+const btn=(label,a,arg,cls,dis)=>`<button class="btn ${cls||''}" data-a="${a}" data-g="${esc(arg===undefined?'':arg)}"${dis?' disabled':''}>${label}</button>`;
+const bar=(cur,max,col,label,big)=>`<div class="bar${big?' big':''}"><i style="width:${max>0?clamp(cur/max*100,0,100):0}%;background:${col}"></i><span>${label}</span></div>`;
+const iname=id=>IT[id]?`<span class="${IT[id].r}">${IT[id].n}</span>`:id;
+const ast=a=>{a=a||S.loc;return S.astat[a]||(S.astat[a]={ex:0,ch:0,found:{}})};
+function toast(t){const d=document.createElement('div');d.className='toast';d.innerHTML=t;$('#toasts').appendChild(d);setTimeout(()=>d.remove(),2900)}
+function banner(t,col){const b=$('#banner');b.style.color=col||'#fff';b.textContent=t;b.classList.remove('go');void b.offsetWidth;b.classList.add('go')}
+function pop(t,cls,who){const d=document.createElement('div');d.className='pop '+cls;d.textContent=t;d.style.left=(who==='e'?70:24)+'%';d.style.top=(who==='e'?30:38)+'%';$('#fxl').appendChild(d);setTimeout(()=>d.remove(),1000)}
+function flash(col){if(SET.calm)return;const f=$('#flash');f.style.background=col;f.classList.remove('go');void f.offsetWidth;f.classList.add('go')}
+function shake(){if(SET.calm)return;const s=$('#stage');s.classList.remove('shake');void s.offsetWidth;s.classList.add('shake')}
+function levelFx(){banner('LEVEL UP!','#ffd24a');sfx('levelup');flash('rgba(255,230,120,.6)');if(S&&S.loc)fxAdd('heal','p')}
+function later(fn,ms){const id=B&&B.id;setTimeout(()=>{if(B&&B.id===id)fn()},ms)}
+const statTxt=i=>{const p=[];if(i.atk)p.push('ATK+'+i.atk);if(i.def)p.push('DEF+'+i.def);if(i.t!=='use'){if(i.hp)p.push('HP+'+i.hp);if(i.mp)p.push('MP+'+i.mp)}if(i.luck)p.push('幸運');if(i.desc)p.push(i.desc);return p.join(' ')};
+function confirmBox(msg,ok,label){ui.mok=ok;$('#mbox').innerHTML=`<p>${msg}</p><div class="grid2"><button class="btn" data-a="mcancel">やめる</button><button class="btn on" data-a="mok">${label||'はい'}</button></div>`;$('#modal').hidden=false}
+ACT.mok=()=>{$('#modal').hidden=true;const f=ui.mok;ui.mok=null;f&&f()};
+ACT.mcancel=()=>{$('#modal').hidden=true;ui.mok=null};
+
+function updateHud(){
+  const h=$('#hud');
+  if(!S||ui.scr==='title'||ui.scr==='newgame'){h.style.display='none';return}
+  const st=stats();h.style.display='block';
+  h.innerHTML=`<div class="r1"><span>${esc(S.name)} <small>${JOBS[S.job].n}</small></span><span>Lv<b>${S.lv}</b></span><span>💰<b>${fmt(S.gold)}</b>G</span></div>
+  <div class="bars">${bar(S.hp,st.hp,'#e04a5a',`HP ${S.hp}/${st.hp}`)}${bar(S.mp,st.mp,'#4a8cff',`MP ${S.mp}/${st.mp}`)}${bar(S.exp,needExp(S.lv),'#6ad84a',S.lv>=MAXLV?'EXP MAX':`EXP ${S.exp}/${needExp(S.lv)}`)}</div>`;
+}
+const NAV=[['map','🗺','マップ'],['status','👤','能力'],['inv','🎒','持ち物'],['skills','✨','スキル'],['dex','📖','図鑑'],['quests','📜','依頼'],['ach','🏆','実績'],['train','💪','鍛錬'],['settings','⚙','設定'],['save','💾','セーブ']];
+const NOnav=['title','newgame','battle','dialog','result'];
+function updateNav(){
+  const n=$('#nav');
+  if(!S||NOnav.includes(ui.scr)){n.style.display='none';return}
+  n.style.display='grid';
+  n.innerHTML=NAV.map(x=>`<button class="nb" data-a="nav" data-g="${x[0]}">${x[1]}<br>${x[2]}</button>`).join('');
+}
+function render(){
+  updateHud();updateNav();
+  try{SCR[ui.scr]()}catch(e){console.error(e);panel.innerHTML=`<p class="ng">画面エラー: ${esc(e.message)}</p>${S?btn('町へ戻る','recover'):btn('タイトルへ','totitle')}`}
+  let mode='town';
+  if(ui.scr==='battle'&&B)mode=B.e.boss?'boss':'battle';
+  else if(ui.scr==='dialog'&&ui.dlg&&ui.dlg.bgm)mode=ui.dlg.bgm;
+  else if(S&&ui.scr!=='title'&&ui.scr!=='newgame'&&S.loc!=='town')mode='dungeon';
+  Snd.bgm(mode);
+}
+function setScr(n){ui.scr=n;ui.bm='main';render();window.scrollTo(0,0)}
+const home=()=>setScr(S.loc==='town'?'town':'area');
+ACT.home=()=>{ui.log=[];home()};
+ACT.recover=()=>{S.loc='town';B=null;ui.log=[];setScr('town')};
+ACT.totitle=()=>{B=null;setScr('title')};
+ACT.nav=s=>{ui.log=[];ui.tab=s==='inv'?'equip':ui.tab;setScr(s)};
+ACT.go=s=>{ui.log=[];if(s==='weapon'){ui.stab='weapon';ui.mode='buy'}if(s==='item')ui.mode='buy';setScr(s)};
+
+/* ============ 報酬・アイテム・クエスト基盤 ============ */
+function giveItem(id,n){
+  n=n||1;S.inv[id]=(S.inv[id]||0)+n;S.found[id]=(S.found[id]||0)+n;
+  if(S.loc!=='town'){const f=ast().found;f[id]=(f[id]||0)+n}
+  if(IT[id].r==='legend')S.flags.legend=true;
+}
+function giveReward(rw){
+  const out=[];
+  if(rw.gold){S.gold+=rw.gold;S.st.gold+=rw.gold;out.push(`💰${fmt(rw.gold)}G`)}
+  if(rw.exp){out.push(`EXP${fmt(rw.exp)}`);gainExp(rw.exp).forEach(say)}
+  if(rw.items)for(const id of Object.keys(rw.items)){giveItem(id,rw.items[id]);out.push(`${iname(id)}×${rw.items[id]}`)}
+  return out.join(' ');
+}
+function ensureDaily(){
+  const t=todayStr();if(S.daily.date===t&&S.daily.list.length)return;
+  const picks=DAILY_T.slice().sort(()=>Math.random()-.5).slice(0,3);
+  S.daily={date:t,list:picks.map(p=>({k:p.k,n:rnd(p.r[0],p.r[1]),p:0,claimed:false}))};
+}
+function ev(type,key,n){
+  n=n||1;ensureDaily();
+  for(const id of Object.keys(S.quests.active)){
+    const q=QM[id];if(!q||q.ty!==type||q.ty==='collect')continue;
+    if(q.tg===undefined||q.tg==='*'||q.tg===key){const a=S.quests.active[id];a.p=Math.min(q.cnt,(a.p||0)+n)}
+  }
+  for(const d of S.daily.list)if(d.k===type&&!d.claimed)d.p=Math.min(d.n,d.p+n);
+}
+const qprog=q=>q.ty==='collect'?Math.min(q.cnt,S.inv[q.tg]||0):((S.quests.active[q.id]||{}).p||0);
+const dreward=d=>({exp:Math.round(d.n*(10+S.lv*2)),gold:Math.round(d.n*(10+S.lv*3)),items:{potion:1}});
+function unlockArea(id){
+  if(S.unlocked[id])return;S.unlocked[id]=true;
+  toast(`🗺 新エリア解放：${AREAS[id].n}`);say(`🗺 新エリア「${AREAS[id].n}」が解放された！`);banner('NEW AREA!','#6af0ff');sfx('ach');
+}
+function checkAch(){
+  for(const a of ACH){
+    if(S.ach[a.id])continue;let ok=false;try{ok=a.t()}catch(e){}
+    if(!ok)continue;
+    S.ach[a.id]=Date.now();if(!S.titles.includes(a.ti))S.titles.push(a.ti);
+    const r=giveReward(a.rw||{});
+    toast(`🏆 実績解除：${a.n}<br><span class="hl">称号「${a.ti}」</span>`);sfx('ach');
+    say(`🏆実績「${a.n}」解除！称号「${a.ti}」 ${r}`);
+  }
+}
+
+/* ============ タイトル・ニューゲーム・会話 ============ */
+SCR.title=()=>{
+  const has=storeOK()?newestSlot():null;
+  panel.innerHTML=`<div class="title-wrap"><div class="gtitle">トレーニング・クエスト</div><div class="gsub">― 失われた冒険者の世界 ―</div>
+  <p class="dim">魔物に封印されたダンジョンを解き放ち、魔王の秘密を解き明かせ。<br>冒険も、休息も、あなたのペースで。</p>
+  <div class="col">${has?btn('▶ つづきから','cont','','on'):''}${btn('✦ はじめから','new')}${has?btn('📂 セーブデータを選ぶ','loadsel'):''}</div>
+  ${storeOK()?'':'<p class="ng">⚠ このブラウザではセーブが使えません(プライベートモード等)。</p>'}
+  <p class="dim">音が鳴ります。画面をタップして開始してください。</p></div>`;
+};
+ACT.cont=()=>{const sl=newestSlot();if(sl&&loadSlot(sl)){afterLoad()}else{sfx('err');toast('セーブデータがありません')}};
+function afterLoad(){B=null;ensureDaily();ui.log=[];say('冒険の続きを始めよう。');setScr(S.loc==='town'?'town':'area')}
+ACT.loadsel=()=>{ui.fromTitle=true;setScr('save')};
+ACT.new=()=>{ui.job='sword';setScr('newgame')};
+SCR.newgame=()=>{
+  panel.innerHTML=`<h2>✦ 冒険者の登録</h2><label>名前(最大8文字)</label><input id="nm" type="text" maxlength="8" value="ユウ" autocomplete="off">
+  <label>職業を選んでください</label>${Object.keys(JOBS).map(k=>`<div class="jobc ${ui.job===k?'on':''}" data-a="pickjob" data-g="${k}"><b style="color:${JOBS[k].col}">${JOBS[k].n}</b><br><span class="dim">${JOBS[k].d}</span><br><span class="dim">HP${JOBS[k].hp} MP${JOBS[k].mp} ATK${JOBS[k].atk} DEF${JOBS[k].def}</span></div>`).join('')}
+  <div class="grid2">${btn('戻る','totitle')}${btn('この職業で始める','start','','on')}</div>`;
+};
+ACT.pickjob=j=>{const nm=$('#nm')?$('#nm').value:'';ui.job=j;render();if($('#nm'))$('#nm').value=nm};
+ACT.start=()=>{
+  const nm=($('#nm').value||'').trim().slice(0,8)||'ユウ';
+  S=newState(nm,ui.job);const st=stats();S.hp=st.hp;S.mp=st.mp;ensureDaily();B=null;
+  startDialog([['ナレーション','かつて、世界各地のダンジョンは魔物によって封印された。'],['ナレーション','人々は町に閉じこもり、冒険者の到来を待っている。'],['ナレーション',`新米冒険者「${esc(nm)}」は、はじまりの町に降り立った。`],['ナレーション','(無理は禁物。冒険も休息も、あなたのペースで。筋トレは完全に任意です)']],()=>{S.loc='town';autosave();ui.log=['町の広場に着いた。まずは掲示板や武器屋を見てみよう。'];setScr('town')});
+};
+function startDialog(lines,done,bgm){ui.dlg={lines,i:0,done,bgm};setScr('dialog')}
+SCR.dialog=()=>{
+  const d=ui.dlg,l=d.lines[d.i];
+  panel.innerHTML=`<div class="dlg"><div class="who">${l[0]}</div><div>${l[1]}</div></div><div class="col">${btn(d.i<d.lines.length-1?'次へ ▶':'閉じる','dnext','','on')}</div>`;
+};
+ACT.dnext=()=>{const d=ui.dlg;if(d.i<d.lines.length-1){d.i++;render()}else{ui.dlg=null;d.done&&d.done()}};
+
+/* ============ 町 ============ */
+SCR.town=()=>{
+  const stage=Object.keys(S.bossDone).length;
+  const hint=S.flags.cleared?'魔王を倒した今も、冒険は続けられる。レアな装備を探しに行こう。':['まずは掲示板の依頼と、緑の森の探索から。','森の主を倒せば、新しい道が開けるはず。','洞窟の奥には何かが眠っている。','古城の竜は強敵だ。装備を整えよう。','いよいよ魔王の城だ。準備を万全に。'][Math.min(stage,4)];
+  panel.innerHTML=`<h2>🏘 はじまりの町</h2><p class="dim">${hint}</p>${logBox()}
+  <div class="grid2">${btn('⚔ 武器屋','go','weapon')}${btn('🧪 道具屋','go','item')}${btn('🛏 宿屋','go','inn')}${btn('🔨 鍛冶屋','go','smith')}${btn('🏛 冒険者ギルド','go','guild')}${btn('📋 掲示板','go','board')}${btn('💬 広場で話す','go','plaza')}${btn('🗺 ワールドマップ','nav','map')}</div>`;
+};
+const NPCS={
+elder:{n:'村長ガレス',ic:'👴'},child:{n:'少女ミナ',ic:'👧'},vet:{n:'元冒険者ロイド',ic:'🧔'},scholar:{n:'学者セレナ',ic:'📚'}
+};
+SCR.plaza=()=>{
+  panel.innerHTML=`<h2>💬 町の広場</h2><p class="dim">町の人々に話しかけてみよう。</p><div class="grid2">${Object.keys(NPCS).map(k=>btn(NPCS[k].ic+' '+NPCS[k].n,'talk',k)).join('')}</div>${logBox()}${btn('町へ戻る','home')}`;
+};
+function npcLines(id){
+  const bd=S.bossDone,stage=Object.keys(bd).length,n=NPCS[id].n,cl=S.flags.cleared;
+  if(id==='elder'){
+    if(cl)return [[n,'おお、英雄よ！魔王…いや、勇者アークの魂は解放されたのだな。町の者も皆、感謝しておる。'],[n,'まだ見ぬ宝が各地に眠っておる。気の向くままに旅を続けるがよい。']];
+    return [[n,['よく来てくれた。各地のダンジョンは魔物に封じられ、町は孤立しておる。','森の主を倒したと聞いた。次は洞窟じゃな。あそこには「光る欠片」があるはずじゃ。','古い城に竜が棲みついておる。決して油断するでないぞ。','魔王の城への道が開いたか…。どうか無事で帰ってきておくれ。'][Math.min(stage,3)]],[n,'疲れたら宿屋で休むのじゃぞ。無理は禁物じゃ。']];
+  }
+  if(id==='child')return [[n,'冒険者さん、「鍛錬の間」って知ってる？メニューの「鍛錬」から、自分の筋トレを記録できるんだって。'],[n,'でもね、やってもやらなくてもいいの。お休みの日だって、冒険だけで強くなれるよ！']];
+  if(id==='vet')return [[n,'戦いのコツを教えてやろう。「防御」するとダメージが減って、MPも少し回復する。'],[n,stage<2?'回復薬は多めに持っていけ。ボスは逃げられんぞ。':'ボスは3ターンごとに大技を使ってくる。その前に防御か回復だ！'],[n,'ゴーレムは力を溜めたら次が危険だ。守りの薬も役に立つぞ。']];
+  if(id==='scholar'){
+    const L=[[n,'古文書を研究しているの。ダンジョンの奥に、世界の秘密が隠されているわ。']];
+    if(!S.flags.gift_sch){S.flags.gift_sch=1;L.push([n,'研究の協力のお礼に、魔力の水をあげる。持っていって！']);giveItem('ether',2);autosave()}
+    L.push([n,stage<1?'まずは森の石碑を探してみて。':stage<3?'壁画や書庫に、魔王の正体のヒントがあるはずよ。':'魔王の正体…勇者アークの記録を、ギルドで読み返してみて。']);
+    return L;
+  }
+  return [[n,'…']];
+}
+ACT.talk=id=>{startDialog(npcLines(id),()=>{setScr('plaza')})};
+
+/* ============ ショップ ============ */
+const tier=()=>Math.min(3,['forest','cave','castle'].filter(a=>S.bossDone[a]).length);
+function owned(id){return S.inv[id]||0}
+function equippedCount(id){return ['weapon','armor','acc'].filter(s=>S.eq[s]===id).length}
+function shopScreen(kind){
+  const isW=kind==='weapon',types=isW?[ui.stab]:['use','mat'];
+  let h=`<h2>${isW?'⚔ 武器屋':'🧪 道具屋'}</h2><p class="dim">所持金：<span class="gold">${fmt(S.gold)}G</span>　${isW?'ボスを倒すと品揃えが増える':'薬や強化アイテムを扱っている'}</p>`;
+  if(isW)h+=`<div class="tabs">${[['weapon','武器'],['armor','防具'],['acc','装飾']].map(x=>btn(x[1],'stab',x[0],ui.stab===x[0]?'on':'')).join('')}</div>`;
+  h+=`<div class="tabs">${btn('買う','smode','buy',ui.mode==='buy'?'on':'')}${btn('売る','smode','sell',ui.mode==='sell'?'on':'')}</div>${logBox()}`;
+  if(ui.mode==='buy'){
+    const list=Object.values(IT).filter(i=>types.includes(i.t)&&i.shop!==undefined&&i.shop<=tier()).sort((a,b)=>a.price-b.price);
+    h+=list.map(i=>{
+      const can=S.gold>=i.price;let extra='';
+      if(i.t!=='use'&&i.t!=='mat'){const cur=IT[S.eq[i.t==='weapon'?'weapon':i.t==='armor'?'armor':'acc']];const k=i.t==='weapon'?'atk':'def';if(i.t!=='acc'){const d=(i[k]||0)-((cur&&cur[k])||0);extra=` <span class="${d>=0?'ok':'ng'}">(${d>=0?'+':''}${d})</span>`}}
+      return `<div class="item"><div class="l">${iname(i.id)}<span class="tag ${i.r}">${RAR[i.r].n}</span>${extra}<br><span class="dim">${statTxt(i)} ／ 所持${owned(i.id)}</span></div><div class="r"><span class="gold">${fmt(i.price)}G</span>${btn('買う','buy',i.id,'sm',!can)}${i.t==='use'?btn('×5','buy',i.id+'|5','sm',S.gold<i.price*5):''}${(i.t==='weapon'||i.t==='armor'||i.t==='acc')&&owned(i.id)>0&&S.eq[i.t]!==i.id?btn('装備','equip',i.id,'sm'):''}</div></div>`}).join('')||'<p class="dim">商品がありません。</p>';
+  }else{
+    const ids=Object.keys(S.inv).filter(id=>types.includes(IT[id].t)||(!isW&&false));
+    const list=ids.map(id=>({i:IT[id],n:S.inv[id]-equippedCount(id)})).filter(x=>x.n>0).sort((a,b)=>a.i.price-b.i.price);
+    h+=list.map(x=>`<div class="item"><div class="l">${iname(x.i.id)}<span class="tag ${x.i.r}">${RAR[x.i.r].n}</span><br><span class="dim">${statTxt(x.i)||x.i.desc||''} ／ 売れる数${x.n}</span></div><div class="r"><span class="gold">${fmt(SELL(x.i))}G</span>${btn('売る','sell',x.i.id,'sm')}${x.n>1?btn('全部','sell',x.i.id+'|'+x.n,'sm'):''}</div></div>`).join('')||'<p class="dim">売れるものがありません。(装備中のものは売れません)</p>';
+  }
+  h+=`<div class="col">${btn('町へ戻る','home')}</div>`;
+  panel.innerHTML=h;
+}
+SCR.weapon=()=>shopScreen('weapon');SCR.item=()=>shopScreen('item');
+ACT.stab=t=>{ui.stab=t;ui.log=[];render()};
+ACT.smode=m=>{ui.mode=m;ui.log=[];render()};
+ACT.buy=a=>{
+  const [id,ns]=a.split('|'),n=+ns||1,it=IT[id];
+  if(!it||S.gold<it.price*n){sfx('err');return}
+  S.gold-=it.price*n;giveItem(id,n);sfx('gold');ui.log=[];say(`${iname(id)}を${n>1?n+'個':''}購入した。(-${fmt(it.price*n)}G)`);autosave();render();
+};
+ACT.sell=a=>{
+  const [id,ns]=a.split('|'),it=IT[id];let n=+ns||1;
+  n=Math.min(n,(S.inv[id]||0)-equippedCount(id));if(n<=0){sfx('err');return}
+  S.inv[id]-=n;if(S.inv[id]<=0)delete S.inv[id];S.gold+=SELL(it)*n;S.st.gold+=SELL(it)*n;sfx('gold');ui.log=[];say(`${iname(id)}を${n}個売った。(+${fmt(SELL(it)*n)}G)`);autosave();render();
+};
+
+/* ============ 宿屋・鍛冶屋 ============ */
+const innCost=()=>8+S.lv*3;
+SCR.inn=()=>{
+  const st=stats();
+  panel.innerHTML=`<h2>🛏 宿屋</h2><p class="txt">「ゆっくり休んでいきなさい」</p><p class="dim">宿泊料：<span class="gold">${innCost()}G</span> ／ HPとMPが全回復し、自動セーブされます。</p>${logBox()}
+  <div class="box">HP ${S.hp}/${st.hp}　MP ${S.mp}/${st.mp}　所持金 ${fmt(S.gold)}G</div>
+  <div class="col">${btn('泊まる','rest','','on',S.gold<innCost()||(S.hp>=st.hp&&S.mp>=st.mp))}${btn('町へ戻る','home')}</div>
+  ${S.gold<innCost()?'<p class="dim">お金が足りないときは、森で魔物を倒したり薬草を拾ったりしましょう。</p>':''}`;
+};
+ACT.rest=()=>{const st=stats();S.gold-=innCost();S.hp=st.hp;S.mp=st.mp;sfx('heal');ui.log=[];say('ぐっすり眠った。HPとMPが全回復した！');autosave();render()};
+const MAXENH=5;
+const enhCost=(it)=>{const e=S.enh[it.id]||0;return {g:Math.floor(it.price*.2*(e+1))+30,o:e}};
+SCR.smith=()=>{
+  const ids=Object.keys(S.inv).filter(id=>IT[id].t==='weapon'||IT[id].t==='armor');
+  let h=`<h2>🔨 鍛冶屋</h2><p class="txt">「装備を鍛えてやろう。+${MAXENH}まで強化できるぞ」</p><p class="dim">所持金 <span class="gold">${fmt(S.gold)}G</span> ／ 鉱石 ${owned('ore')}個　(鉱石は洞窟で入手、または購入)</p>${logBox()}
+  <div class="col">${btn('鉱石を買う (80G)','buyore','', '', S.gold<80)}</div>`;
+  h+=ids.map(id=>{
+    const it=IT[id],e=S.enh[id]||0,c=enhCost(it),max=e>=MAXENH,can=!max&&S.gold>=c.g&&owned('ore')>=c.o;
+    return `<div class="item"><div class="l">${iname(id)} <b class="hl">+${e}</b><br><span class="dim">${statTxt(it)}</span></div><div class="r">${max?'<span class="ok">MAX</span>':`<span class="dim">${fmt(c.g)}G${c.o?'＋鉱石'+c.o:''}</span>${btn('強化','enh',id,'sm',!can)}`}</div></div>`}).join('')||'<p class="dim">強化できる装備がありません。</p>';
+  panel.innerHTML=h+`<div class="col">${btn('町へ戻る','home')}</div>`;
+};
+ACT.buyore=()=>{if(S.gold<80)return sfx('err');S.gold-=80;giveItem('ore',1);sfx('gold');ui.log=[];say('鉱石を1個買った。');render()};
+ACT.enh=id=>{
+  const it=IT[id],e=S.enh[id]||0,c=enhCost(it);
+  if(e>=MAXENH||S.gold<c.g||owned('ore')<c.o)return sfx('err');
+  S.gold-=c.g;if(c.o){S.inv.ore-=c.o;if(S.inv.ore<=0)delete S.inv.ore}
+  S.enh[id]=e+1;sfx('levelup');flash('rgba(255,200,100,.4)');ui.log=[];say(`カンカンカン！ ${iname(id)}が <b class="hl">+${e+1}</b> に強化された！`);autosave();render();
+};
+
+/* ============ ギルド・掲示板・クエスト ============ */
+function questRow(q,mode){
+  const p=qprog(q),done=p>=q.cnt,rw=giveRewardPreview(q.rw);
+  return `<div class="item"><div class="l"><b>${q.n}</b> <span class="dim">[${AREAS[q.area].n}]</span><br><span class="dim">${q.d}</span><br><span class="dim">報酬：${rw}</span>${mode!=='board'?`<br>進行：${p}/${q.cnt}`:''}</div><div class="r">${mode==='board'?btn('受注','accept',q.id,'sm',Object.keys(S.quests.active).length>=5):mode==='guild'?btn(done?'報告する':'未達成','report',q.id,'sm',!done):''}</div></div>`;
+}
+function giveRewardPreview(rw){
+  const o=[];if(rw.exp)o.push('EXP'+rw.exp);if(rw.gold)o.push(rw.gold+'G');if(rw.items)for(const k of Object.keys(rw.items))o.push(IT[k].n+'×'+rw.items[k]);return o.join(' ');
+}
+SCR.guild=()=>{
+  const act=Object.keys(S.quests.active).map(id=>QM[id]).filter(Boolean);
+  panel.innerHTML=`<h2>🏛 冒険者ギルド</h2><p class="txt">受付嬢リナ「おかえりなさい！依頼の報告はこちらです」</p>${logBox()}
+  <h3>受注中の依頼 (${act.length}/5)</h3>${act.map(q=>questRow(q,'guild')).join('')||'<p class="dim">受注中の依頼はありません。掲示板で依頼を受けましょう。</p>'}
+  <div class="grid2">${btn('📜 古文書(魔王の秘密)','go','lore')}${btn('⚔ 転職','go','job')}${btn('📋 掲示板へ','go','board')}${btn('町へ戻る','home')}</div>`;
+};
+ACT.report=id=>{
+  const q=QM[id];if(!q||!S.quests.active[id]||qprog(q)<q.cnt)return sfx('err');
+  if(q.ty==='collect'){S.inv[q.tg]-=q.cnt;if(S.inv[q.tg]<=0)delete S.inv[q.tg]}
+  delete S.quests.active[id];S.quests.done[id]=1;
+  ui.log=[];sfx('win');say(`✅ 依頼「${q.n}」達成！`);say('報酬：'+giveReward(q.rw));
+  if(q.ul)unlockArea(q.ul);
+  checkAch();autosave();render();
+};
+SCR.board=()=>{
+  ensureDaily();
+  const avail=Q.filter(q=>S.unlocked[q.area]&&!S.quests.active[q.id]&&!S.quests.done[q.id]);
+  const dh=S.daily.list.map((d,i)=>{const t=DAILY_T.find(x=>x.k===d.k),ok=d.p>=d.n;return `<div class="item"><div class="l"><b>${t.t(d.n)}</b><br><span class="dim">進行 ${d.p}/${d.n} ／ 報酬：${giveRewardPreview(dreward(d))}</span></div><div class="r">${d.claimed?'<span class="ok">受取済</span>':btn(ok?'受け取る':'未達成','claimd',i,'sm',!ok)}</div></div>`}).join('');
+  panel.innerHTML=`<h2>📋 掲示板</h2><p class="dim">受けた依頼の報告は冒険者ギルドで行います。(受注は最大5件)</p>${logBox()}
+  <h3>🌅 今日の課題 (毎日更新)</h3>${dh}
+  <h3>依頼一覧</h3>${avail.map(q=>questRow(q,'board')).join('')||'<p class="dim">受けられる依頼はありません。新エリアを解放しよう。</p>'}
+  <div class="grid2">${btn('冒険者ギルドへ','go','guild')}${btn('町へ戻る','home')}</div>`;
+};
+ACT.accept=id=>{
+  if(Object.keys(S.quests.active).length>=5)return sfx('err');
+  S.quests.active[id]={p:0};ui.log=[];sfx('click');say(`📋 依頼「${QM[id].n}」を受注した！`);render();
+};
+ACT.claimd=i=>{
+  const d=S.daily.list[i];if(!d||d.claimed||d.p<d.n)return sfx('err');
+  d.claimed=true;ui.log=[];sfx('win');say('🌅 今日の課題を達成！ '+giveReward(dreward(d)));checkAch();autosave();render();
+};
+SCR.quests=()=>{
+  ensureDaily();
+  const act=Object.keys(S.quests.active).map(id=>QM[id]).filter(Boolean);
+  panel.innerHTML=`<h2>📜 クエスト</h2><h3>受注中 (${act.length}/5)</h3>${act.map(q=>{const p=qprog(q);return `<div class="item"><div class="l"><b>${q.n}</b> ${p>=q.cnt?'<span class="ok">達成！ギルドで報告</span>':''}<br><span class="dim">${q.d}</span><br>${bar(p,q.cnt,'#a45cff',p+'/'+q.cnt)}</div></div>`}).join('')||'<p class="dim">受注中の依頼はありません。町の掲示板で受けられます。</p>'}
+  <h3>今日の課題</h3>${S.daily.list.map(d=>{const t=DAILY_T.find(x=>x.k===d.k);return `<div class="item"><div class="l">${t.t(d.n)} ${d.claimed?'<span class="ok">受取済</span>':''}<br>${bar(d.p,d.n,'#4adf8a',d.p+'/'+d.n)}</div></div>`}).join('')}
+  <p class="dim">達成済みの依頼：${Object.keys(S.quests.done).length}件　※依頼は冒険だけで進められます。</p><div class="col">${btn('戻る','home')}</div>`;
+};
+SCR.lore=()=>{
+  const n=LORE_ORDER.filter(l=>S.lore[l]).length;
+  panel.innerHTML=`<h2>📜 古文書 (${n}/${LORE_ORDER.length})</h2><p class="dim">ダンジョンの探索やボス撃破で見つかる、魔王の秘密。</p>${LORE_ORDER.map(l=>`<div class="box">${S.lore[l]?LORE[l]:'<span class="dim">？？？ …まだ見つかっていない。</span>'}</div>`).join('')}${btn('戻る','go','guild')}`;
+};
+SCR.job=()=>{
+  panel.innerHTML=`<h2>⚔ 転職</h2><p class="dim">費用 500G。レベルは維持され、スキルはリセット(スキルポイントは全額返却)。現在：<b>${JOBS[S.job].n}</b></p>${logBox()}
+  ${Object.keys(JOBS).map(k=>`<div class="jobc ${S.job===k?'on':''}"><b style="color:${JOBS[k].col}">${JOBS[k].n}</b><br><span class="dim">${JOBS[k].d}</span><br>${btn(S.job===k?'現在の職業':'転職する','chjob',k,'sm',S.job===k||S.gold<500)}</div>`).join('')}${btn('戻る','go','guild')}`;
+};
+ACT.chjob=k=>confirmBox(`${JOBS[k].n}に転職しますか？(500G／スキルはリセットされます)`,()=>{
+  S.gold-=500;S.job=k;S.skills={};SK.forEach(s=>{if(s.job===k&&s.cost===0)S.skills[s.id]=1});S.sp=S.lv-1;
+  const st=stats();S.hp=Math.min(S.hp,st.hp);S.mp=Math.min(S.mp,st.mp);sfx('levelup');ui.log=[];say(`${JOBS[k].n}に転職した！`);autosave();setScr('job');
+});
+
+/* ============ マップ・エリア・探索 ============ */
+SCR.map=()=>{
+  panel.innerHTML=`<h2>🗺 ワールドマップ</h2><p class="dim">現在地：${AREAS[S.loc].n}</p>${logBox()}`+AORDER.map(id=>{
+    const a=AREAS[id],un=S.unlocked[id],pr=id==='town'?'':` ／ 探索 ${S.prog[id]||0}/${a.need} ${S.bossDone[id]?'<span class="ok">【ボス撃破】</span>':''}`;
+    return `<div class="item"><div class="l"><b>${a.ic} ${a.n}</b> <span class="dim">推奨${a.rec}</span><br><span class="dim">${un?a.d+pr:'🔒 '+a.lock}</span></div><div class="r">${btn(S.loc===id?'現在地':un?'向かう':'封印中','travel',id,'sm',!un||S.loc===id)}</div></div>`}).join('')+`<div class="col">${btn('戻る','home')}</div>`;
+};
+ACT.travel=id=>{
+  if(!S.unlocked[id])return sfx('err');
+  S.loc=id;ui.log=[];sfx('step');say(id==='town'?'町に戻ってきた。':`${AREAS[id].n}に到着した。`);autosave();setScr(id==='town'?'town':'area');
+};
+SCR.area=()=>{
+  const a=AREAS[S.loc],s=ast(),d=S.prog[S.loc]||0,ready=d>=a.need,st=stats();
+  const found=Object.keys(s.found||{});
+  panel.innerHTML=`<h2>${a.ic} ${a.n}</h2><p class="dim">${a.d}　推奨${a.rec}</p>
+  <div class="box">最深部まで：${bar(d,a.need,'#a45cff',ready?'最深部に到達！':`${d}/${a.need}`)}<span class="dim">探索回数 ${s.ex} ／ 宝箱 ${s.ch} ／ ボス ${S.bossDone[S.loc]?'撃破済':'未撃破'}</span></div>${logBox()}
+  <div class="grid2">${btn('🔍 探索する','explore','','on')}${btn('🏕 休憩する','camp')}${btn(S.bossDone[S.loc]?'👹 ボスに再挑戦':'👹 最奥のボスに挑む','boss','','atk',!ready)}${btn('📦 発見した宝物','tre')}${btn('🏘 町へ戻る','travel','town')}${btn('🗺 マップ','nav','map')}</div>
+  ${ui.tre?`<div class="box"><b>この地で見つけた宝物</b><br>${found.length?found.map(id=>`${iname(id)}×${s.found[id]}`).join('　'):'<span class="dim">まだ何も見つけていない</span>'}</div>`:''}
+  <p class="dim">HP ${S.hp}/${st.hp}　回復薬 ${owned('potion')+owned('hipotion')+owned('megapotion')}個</p>`;
+};
+ACT.tre=()=>{ui.tre=!ui.tre;render()};
+function lowHpWarn(){const st=stats();return S.hp<st.hp*.3}
+ACT.explore=()=>{
+  const a=AREAS[S.loc],s=ast();
+  S.st.explores++;s.ex++;ev('explore');sfx('step');ui.log=[];
+  const prev=S.prog[S.loc]||0;S.prog[S.loc]=Math.min(a.need,prev+1);
+  const st=stats();S.mp=Math.min(st.mp,S.mp+1);
+  if(prev<a.need&&S.prog[S.loc]>=a.need){
+    ev('depth',S.loc);
+    const l=a.lore.find(x=>!S.lore[x]);
+    say('✨ 最深部への道が開けた！');
+    if(l){S.lore[l]=1;say('📜 最深部の碑文を発見した…(古文書に追加)')}
+    say('<span class="hl">最奥のボスに挑めるようになった。</span>');
+    sfx('ach');checkAch();autosave();render();return;
+  }
+  const r=Math.random();
+  if(r<.42){const [mid,,sc]=wpick(a.mon);return startBattle(mid,sc||1,pick(a.flav))}
+  else if(r<.56)openChest();
+  else if(r<.66){const id=pick(S.loc==='forest'?['herb','herb','potion']:['potion','potion','hipotion','ether']);giveItem(id,1);say(`🎒 道端で ${iname(id)} を拾った。`);sfx('chest')}
+  else if(r<.72){
+    const pool=a.loot.c.concat(a.loot.r).filter(i=>IT[i].t==='weapon'||IT[i].t==='armor'||IT[i].t==='acc');
+    if(pool.length){const id=pick(pool);giveItem(id,1);say(`⚔ 朽ちた荷物の中から ${iname(id)} を見つけた！`);sfx('chest')}else{const gld=rnd(a.gold[0],a.gold[1]);S.gold+=gld;say(`💰 ${gld}G を拾った。`)}
+  }
+  else if(r<.79){const h=Math.floor(st.hp*.3),m=Math.floor(st.mp*.3);S.hp=Math.min(st.hp,S.hp+h);S.mp=Math.min(st.mp,S.mp+m);sfx('heal');say(`💧 清らかな泉を見つけた。HP+${h} MP+${m}`)}
+  else if(r<.84){const dm=Math.min(S.hp-1,Math.max(1,Math.floor(st.hp*.06)));S.hp-=dm;sfx('hurt');say(`⚠ 罠にかかってしまった！ ${dm}のダメージ。(HPは1以下にならない)`)}
+  else if(r<.9){
+    const l=a.lore.find(x=>!S.lore[x]);
+    if(l){S.lore[l]=1;say('📜 古い碑文を見つけた…！古文書に追加された。');sfx('ach')}
+    else{const xp=Math.round(5+S.lv*2);say(`📖 古い記録を読み返した。(EXP+${xp})`);gainExp(xp).forEach(say)}
+  }
+  else if(r<.95){const g=rnd(a.gold[0],a.gold[1]);S.gold+=g;S.st.gold+=g;sfx('gold');say(`💰 落ちていた袋に ${g}G が入っていた。`)}
+  else{say('旅の商人とすれ違った。「また会いましょう」と薬をくれた。');giveItem('potion',1);sfx('chest')}
+  if(a.extra&&Math.random()<a.extra[1]*(1+stats().luck*.3)&&r>=.42){giveItem(a.extra[0],1);say(`✦ ${iname(a.extra[0])} を見つけた。`)}
+  checkAch();autosave();render();
+};
+function openChest(){
+  const a=AREAS[S.loc],L=a.loot,lk=stats().luck,r=Math.random();
+  const lg=L.l.length?.006*(1+lk*.6):0,ep=L.e.length?.03*(1+lk*.5):0,ra=.16*(1+lk*.35);
+  let pool,rar='common';
+  if(r<lg){pool=L.l;rar='legend'}else if(r<lg+ep){pool=L.e;rar='epic'}else if(r<lg+ep+ra){pool=L.r;rar='rare'}else pool=L.c;
+  const id=pick(pool),n=IT[id].t==='use'&&IT[id].r==='common'?rnd(1,2):1,gold=rnd(a.gold[0],a.gold[1]);
+  S.gold+=gold;S.st.gold+=gold;giveItem(id,n);S.st.chests++;ast().ch++;ev('chest');
+  sfx('chest');
+  if(rar!=='common'){toast(`✨ ${RAR[rar].n}を発見！ ${iname(id)}`);banner(rar==='legend'?'LEGEND!':'RARE!',rar==='legend'?'#ffb53a':'#b46bff')}
+  say(`📦 宝箱を開けた！ ${iname(id)}${n>1?'×'+n:''} と ${gold}G を手に入れた${rar!=='common'?' ✨':''}`);
+}
+ACT.camp=()=>{
+  const st=stats();ui.log=[];
+  if(S.hp>=st.hp&&S.mp>=st.mp){say('体力は十分だ。休憩の必要はなさそうだ。');sfx('err');return render()}
+  const h=Math.floor(st.hp*.2),m=Math.floor(st.mp*.2);S.hp=Math.min(st.hp,S.hp+h);S.mp=Math.min(st.mp,S.mp+m);sfx('heal');
+  say(`🏕 野営で休んだ。HP+${h} MP+${m}`);
+  if(Math.random()<.22){const [mid,,sc]=wpick(AREAS[S.loc].mon);return startBattle(mid,sc||1,'休憩中に魔物が襲ってきた！')}
+  autosave();render();
+};
+ACT.boss=()=>confirmBox(`${MON[AREAS[S.loc].boss].n}に挑みます。ボスからは逃げられません。HPは足りていますか？`,()=>startBattle(AREAS[S.loc].boss,1,''),'挑む');
+
+/* ============ バトル ============ */
+const calcDmg=(A,D,pierce)=>Math.max(1,Math.round(A*A/(A+D*(1-(pierce||0)))*(.9+Math.random()*.2)));
+function startBattle(mid,sc,intro){
+  sc=sc||1;const m=MON[mid],k=Math.pow(sc,.8);
+  const e={id:mid,n:m.n,hp:Math.round(m.hp*sc),atk:Math.round(m.atk*k),def:Math.round(m.def*k),exp:Math.round(m.exp*sc),gold:Math.round(m.gold*sc),boss:!!m.boss,tr:m.tr};
+  e.max=e.hp;
+  B={id:++bid,e,turn:1,defend:false,buf:{atk:0,def:0},busy:false,poison:0,charge:false,eturn:0,over:false,phit:0,ehit:0,eshake:0};
+  S.st.battles++;const d=S.dex[mid]||(S.dex[mid]={s:0,k:0});d.s++;
+  ui.log=[];if(intro)say(intro);
+  say(m.boss?`<span class="ng">${m.n}が立ちはだかる！</span>`:`${m.n}が現れた！`);
+  if(m.boss){sfx('boss');banner('BOSS BATTLE','#ff6a6a');flash('rgba(255,0,0,.4)');shake()}
+  checkAch();setScr('battle');
+}
+SCR.battle=()=>{
+  const e=B.e,st=stats(),dis=B.busy||B.over;
+  const sk=SK.filter(k=>S.skills[k.id]&&k.k!=='pas');
+  const its=Object.keys(S.inv).filter(id=>{const i=IT[id];return i.t==='use'&&(i.heal||i.mp||i.cure||i.buff)});
+  let h=`<h2>${e.boss?'⚠ ':''}${e.n}</h2>${bar(e.hp,e.max,e.boss?'#ff4a6a':'#e04a5a',`${e.n} HP ${e.hp}/${e.max}`,true)}
+  <p class="dim">${e.tr?'特徴：'+TRAIT[e.tr]:''}${B.poison?' <span class="ng">☠毒(残り'+B.poison+')</span>':''}${B.buf.atk>0?' <span class="ok">ATK↑'+B.buf.atk+'</span>':''}${B.buf.def>0?' <span class="ok">DEF↑'+B.buf.def+'</span>':''}</p>${logBox()}`;
+  if(ui.bm==='main')h+=`<div class="grid2">${btn('⚔ 攻撃','atk','','atk',dis)}${btn('🛡 防御','def','','def',dis)}${btn('✨ スキル','bmenu','skill','skl',dis)}${btn('🧪 アイテム','bmenu','item','itm',dis)}</div>${btn('🏃 逃げる','flee','','',dis)}`;
+  else if(ui.bm==='skill')h+=`<div class="col">${sk.map(k=>btn(`${k.n} <small>MP${k.mp} ／ ${k.d}</small>`,'skill',k.id,'skl',dis||S.mp<k.mp)).join('')||'<p class="dim">使えるスキルがありません。</p>'}${btn('戻る','bmenu','main')}</div>`;
+  else h+=`<div class="col">${its.map(id=>btn(`${IT[id].n} ×${S.inv[id]} <small>${IT[id].desc}</small>`,'bitem',id,'itm',dis)).join('')||'<p class="dim">使えるアイテムがありません。</p>'}${btn('戻る','bmenu','main')}</div>`;
+  panel.innerHTML=h;
+};
+ACT.bmenu=m=>{if(B&&!B.busy){ui.bm=m;render()}};
+function pAct(fn){if(!B||B.busy||B.over)return;B.busy=true;ui.bm='main';fn()}
+function afterPlayer(){
+  render();
+  if(B.e.hp<=0){later(victory,650)}else{later(enemyTurn,750)}
+}
+function playerHit(A,pierce,fx,name){
+  const e=B.e;
+  if(e.tr==='evade'&&Math.random()<.2){say(`${name}！ しかし${e.n}にかわされた！`);pop('MISS','t','e');sfx('click');return afterPlayer()}
+  const crit=Math.random()<.08+stats().luck*.02,dmg=calcDmg(A*(crit?1.6:1),e.def,pierce);
+  e.hp=Math.max(0,e.hp-dmg);B.ehit=4;B.eshake=6;
+  fxAdd(fx,'e');sfx(crit?'crit':(fx==='fire'||fx==='bolt'?'magic':'hit'));
+  pop(dmg,crit?'c':'d','e');say(`${name}！ ${e.n}に<b>${dmg}</b>のダメージ${crit?' <span class="hl">会心！</span>':''}`);
+  afterPlayer();
+}
+ACT.atk=()=>pAct(()=>{const st=stats();let A=st.atk*JOBS[S.job].basic;if(B.buf.atk>0)A*=1.4;playerHit(A,0,'slash','攻撃')});
+ACT.def=()=>pAct(()=>{
+  B.defend=true;const st=stats(),mg=Math.floor(st.mp*.08)+1;S.mp=Math.min(st.mp,S.mp+mg);let msg=`🛡 身を守っている…(MP+${mg})`;
+  if(S.job==='guard'){const hh=Math.floor(st.hp*.06);S.hp=Math.min(st.hp,S.hp+hh);pop('+'+hh,'h','p');msg+=` HP+${hh}`}
+  say(msg);sfx('click');updateHud();afterPlayer();
+});
+ACT.skill=id=>pAct(()=>{
+  const k=SKM[id];
+  if(!k||!S.skills[id]||S.mp<k.mp){B.busy=false;sfx('err');return render()}
+  S.mp-=k.mp;S.st.skillUses++;ev('skill');updateHud();
+  if(k.k==='dmg'){const st=stats();let A=(k.useDef?st.atk+st.def:st.atk)*k.m;if(B.buf.atk>0)A*=1.4;playerHit(A,k.pierce,k.fx,k.n)}
+  else{
+    const st=stats(),amt=k.base+Math.round(st.hp*k.r),before=S.hp;S.hp=Math.min(st.hp,S.hp+amt);
+    if(k.cure)B.poison=0;fxAdd('heal','p');sfx('heal');pop('+'+(S.hp-before),'h','p');say(`${k.n}！ HPが${S.hp-before}回復した${k.cure?'(毒も治った)':''}`);updateHud();afterPlayer();
+  }
+});
+function applyItem(id,inB){
+  const it=IT[id],st=stats();if(!S.inv[id])return null;let msg=null;
+  if(it.heal){
+    if(S.hp>=st.hp&&!(it.mpFull&&S.mp<st.mp))return null;
+    const b=S.hp;S.hp=Math.min(st.hp,S.hp+it.heal);if(it.mpFull)S.mp=st.mp;msg=`HPが${S.hp-b}回復した`;if(inB)pop('+'+(S.hp-b),'h','p');ev('item');sfx('heal');
+  }else if(it.mp){
+    if(S.mp>=st.mp)return null;const b=S.mp;S.mp=Math.min(st.mp,S.mp+it.mp);msg=`MPが${S.mp-b}回復した`;ev('item');sfx('heal');
+  }else if(it.cure){if(!inB||!B.poison)return null;B.poison=0;msg='毒が消えた';sfx('heal')}
+  else if(it.buff){if(!inB)return null;B.buf[it.buff]=5;msg=`${it.buff==='atk'?'攻撃':'防御'}力が上がった！`;sfx('heal')}
+  else if(it.perm){if(inB)return null;S.bonus[it.perm]+=it.perm==='hp'?8:it.perm==='mp'?3:1;msg='能力が永久に上がった！';sfx('levelup')}
+  else return null;
+  S.inv[id]--;if(S.inv[id]<=0){delete S.inv[id];for(const s of ['weapon','armor','acc'])if(S.eq[s]===id)S.eq[s]=null}
+  S.st.itemUses++;return msg;
+}
+ACT.bitem=id=>pAct(()=>{
+  const m=applyItem(id,true);
+  if(!m){B.busy=false;sfx('err');say('今は使っても効果がなさそうだ。');return render()}
+  say(`${iname(id)}を使った。${m}`);updateHud();afterPlayer();
+});
+ACT.flee=()=>pAct(()=>{
+  if(B.e.boss){say('ボスからは逃げられない！');sfx('err');B.busy=false;return render()}
+  if(Math.random()<.65){
+    B.over=true;S.st.flee++;ui.log=[];say('うまく逃げ切った！');ui.res={t:'逃走成功',c:'dim'};ui.next='home';autosave();setScr('result');
+  }else{say('逃げられなかった！');afterPlayer2()}
+});
+function afterPlayer2(){render();later(enemyTurn,700)}
+function enemyTurn(){
+  if(!B||B.over)return;
+  const e=B.e,m=MON[e.id];B.eturn++;
+  let plan={mult:1,n:1,label:`${e.n}の攻撃`},sp=null;
+  if(e.boss){
+    if(m.sp2&&e.hp<e.max/2&&B.eturn%m.sp2.e===0)sp=m.sp2;else if(m.sp&&B.eturn%m.sp.e===0)sp=m.sp;
+  }
+  if(sp){plan={mult:sp.m,n:1,label:`<span class="ng">${sp.n}</span>`,sp}}
+  else if(e.tr==='heavy'){
+    if(B.charge){B.charge=false;plan={mult:2.2,n:1,label:`${e.n}の渾身の一撃`}}
+    else if(Math.random()<.3){B.charge=true;say(`${e.n}は力を溜めている…！`);return endEnemyTurn()}
+  }else if(e.tr==='double'&&Math.random()<.3)plan.n=2;
+  if(plan.sp){banner('⚠ '+plan.sp.n,plan.sp.col);fxAdd('breath','p',plan.sp.col,700);flash(plan.sp.col+'99');shake();sfx('boss');render();later(()=>doHits(plan),600)}
+  else doHits(plan);
+}
+function doHits(plan){
+  const e=B.e,st=stats();
+  for(let i=0;i<plan.n;i++){
+    const D=st.def*(B.buf.def>0?1.4:1);
+    let dmg=calcDmg(e.atk*plan.mult,D,0);
+    if(B.defend)dmg=Math.max(1,Math.round(dmg*(1-JOBS[S.job].red)));
+    S.hp=Math.max(0,S.hp-dmg);B.phit=4;fxAdd('hit','p');if(!plan.sp)sfx('hurt');
+    pop(dmg,'x','p');say(`${plan.label}${plan.n>1?`(${i+1}回目)`:''}！ <b>${dmg}</b>のダメージを受けた${B.defend?'(防御)':''}`);
+    if(e.tr==='drain'){const h=Math.round(dmg*.5);e.hp=Math.min(e.max,e.hp+h);say(`${e.n}はHPを${h}吸収した！`)}
+    if(e.tr==='poison'&&!B.poison&&Math.random()<.4){B.poison=3;say('<span class="ng">☠ 毒を受けた！</span>')}
+    if(S.hp<=0)break;
+  }
+  updateHud();
+  if(S.hp<=0){render();return later(defeat,700)}
+  endEnemyTurn();
+}
+function endEnemyTurn(){
+  if(B.poison>0){
+    const st=stats(),dm=Math.max(1,Math.floor(st.hp*.04));S.hp=Math.max(0,S.hp-dm);B.poison--;pop(dm,'x','p');say(`☠ 毒のダメージ ${dm}`);
+    if(S.hp<=0){updateHud();render();return later(defeat,700)}
+  }
+  B.turn++;B.defend=false;B.buf.atk=Math.max(0,B.buf.atk-1);B.buf.def=Math.max(0,B.buf.def-1);
+  const st=stats();S.mp=Math.min(st.mp,S.mp+1);B.busy=false;updateHud();render();
+}
+const FIRST={goblinking:{silver_blade:1},guardian:{mithril:1,frag:3},dragon:{dragon_fang:1,scale:1},demon:{emblem:1,elixir:2}};
+function victory(){
+  B.over=true;const e=B.e,m=MON[e.id];ui.log=[];
+  S.st.kills++;S.dex[e.id].k++;ev('kill',e.id);
+  say(`🎉 ${e.n}を倒した！`);
+  const gold=e.gold;S.gold+=gold;S.st.gold+=gold;say(`EXP ${e.exp} ／ 💰${gold}G を獲得`);
+  gainExp(e.exp).forEach(say);
+  const dr=m.drop;if(dr&&Math.random()<dr[1]*(1+stats().luck*.2)){giveItem(dr[0],1);say(`🎁 ${iname(dr[0])} を落とした！`)}
+  const ex=AREAS[S.loc].extra;if(ex&&!e.boss&&Math.random()<ex[1]){giveItem(ex[0],1);say(`🎁 ${iname(ex[0])} を拾った！`)}
+  if(Math.random()<.015*(1+stats().luck*.5)&&!e.boss){const id=pick(AREAS[S.loc].loot.r.filter(i=>IT[i].t!=='use'));if(id){giveItem(id,1);say(`✨ レアドロップ！ ${iname(id)}`)}}
+  ui.res={t:'VICTORY!',c:'hl'};ui.next='home';
+  if(e.boss){
+    S.st.bosses++;ev('boss',e.id);const first=!S.bossDone[S.loc];S.bossDone[S.loc]=true;
+    const l=BOSS_LORE[e.id];if(l&&!S.lore[l]){S.lore[l]=1;say('📜 古文書に新たな記述が加わった。')}
+    if(first){const f=FIRST[e.id]||{};for(const id of Object.keys(f)){giveItem(id,f[id]);say(`🌟 ボス撃破報酬：${iname(id)}×${f[id]}`)}}
+    else if(m.drop&&Math.random()<.5){giveItem(m.drop[0],1);say(`🎁 ${iname(m.drop[0])} を落とした！`)}
+    const nx=NEXTA[S.loc];if(nx)unlockArea(nx);
+    ui.res={t:'BOSS CLEAR!',c:'hl'};
+    if(e.id==='demon'&&!S.flags.cleared){S.flags.cleared=true;ui.next='ending'}
+  }
+  const st=stats();S.mp=Math.min(st.mp,S.mp+Math.ceil(st.mp*.15));
+  checkAch();autosave();sfx('win');setScr('result');
+}
+function defeat(){
+  B.over=true;sfx('lose');S.st.deaths++;const lost=Math.floor(S.gold*.1);S.gold-=lost;
+  const st=stats();S.hp=Math.max(1,Math.floor(st.hp*.5));S.mp=Math.floor(st.mp*.5);S.loc='town';
+  ui.log=[];say('目の前が真っ暗になった…');say(`気がつくと町の神殿だった。(所持金 -${fmt(lost)}G。装備・アイテム・進行は失われていません)`);
+  ui.res={t:'全滅…',c:'ng'};ui.next='home';autosave();setScr('result');
+}
+SCR.result=()=>{
+  panel.innerHTML=`<h2 class="${ui.res.c}">${ui.res.t}</h2>${logBox()}<div class="col">${btn('続ける','cont2','','on')}</div>`;
+};
+ACT.cont2=()=>{
+  const n=ui.next;B=null;ui.next=null;
+  if(n==='ending')return startEnding();
+  ui.log=[];home();
+};
+function startEnding(){
+  startDialog([['魔王','…見事だ。これで、闇の核は砕かれた。'],['魔王','私はアーク。かつて世界を救うため、闇を己に封じた者だ。'],['アーク','魔物たちは、封印が解けぬよう私を守っていただけ。彼らを責めないでやってくれ。'],['アーク','ありがとう、冒険者よ。君の意志が、長い夜を終わらせた…'],['ナレーション','闇は光となって消え、勇者アークの魂は解放された。封印の役目を終えたダンジョンの門は、静かに開いていく。'],['ナレーション',`こうして、冒険者「${esc(S.name)}」の物語は一つの終わりを迎えた。`],['ナレーション','THE END ――― だが、冒険はまだ続く。未踏の宝を探しに行こう！']],()=>{S.loc='town';ui.log=['🎊 エンディングを迎えた！冒険は引き続き楽しめる。'];checkAch();autosave();setScr('town')},'ending');
+}
+
+/* ============ ステータス・持ち物・スキル ============ */
+SCR.status=()=>{
+  const st=stats(),j=JOBS[S.job],sl={weapon:'武器',armor:'防具',acc:'装飾'};
+  panel.innerHTML=`<h2>👤 ステータス</h2><div class="box"><p><b>${esc(S.name)}</b> ／ ${j.n} ／ <span class="hl">『${esc(S.title)}』</span></p>
+  <p>Lv <b>${S.lv}</b>　スキルポイント <b class="hl">${S.sp}</b></p>${bar(S.exp,needExp(S.lv),'#6ad84a',S.lv>=MAXLV?'EXP MAX':`次のLvまで ${needExp(S.lv)-S.exp}`,true)}
+  <p>HP <b>${S.hp}/${st.hp}</b>　MP <b>${S.mp}/${st.mp}</b></p><p>攻撃力 <b>${st.atk}</b>　防御力 <b>${st.def}</b>　幸運 <b>${st.luck}</b></p><p>所持金 <b class="gold">${fmt(S.gold)}G</b></p></div>
+  <h3>装備</h3>${['weapon','armor','acc'].map(s=>`<div class="item"><div class="l"><span class="dim">${sl[s]}</span> ${S.eq[s]?iname(S.eq[s])+(S.enh[S.eq[s]]?' <b class="hl">+'+S.enh[S.eq[s]]+'</b>':''):'<span class="dim">なし</span>'}</div><div class="r">${S.eq[s]?btn('外す','unequip',s,'sm'):''}</div></div>`).join('')}
+  <h3>記録</h3><div class="box dim">討伐 ${S.st.kills}体 ／ 戦闘 ${S.st.battles}回 ／ ボス撃破 ${S.st.bosses}回<br>探索 ${S.st.explores}回 ／ 宝箱 ${S.st.chests}個 ／ 全滅 ${S.st.deaths}回 ／ 累計獲得 ${fmt(S.st.gold)}G</div>
+  <h3>称号を選ぶ</h3><div class="grid2">${S.titles.map(t=>btn(esc(t),'settitle',t,'sm'+(t===S.title?' on':''))).join('')}</div>
+  <div class="col">${btn('戻る','home')}</div>`;
+};
+ACT.settitle=t=>{if(S.titles.includes(t)){S.title=t;sfx('click');render()}};
+ACT.unequip=s=>{S.eq[s]=null;const st=stats();S.hp=Math.min(S.hp,st.hp);S.mp=Math.min(S.mp,st.mp);sfx('click');autosave();render()};
+ACT.equip=id=>{
+  const it=IT[id];if(!it||!S.inv[id]||!['weapon','armor','acc'].includes(it.t))return sfx('err');
+  S.eq[it.t]=id;sfx('click');autosave();render();
+};
+SCR.inv=()=>{
+  const st=stats(),tabs=[['equip','装備品'],['use','道具'],['mat','素材']];
+  const ids=Object.keys(S.inv).filter(id=>{const t=IT[id].t;return ui.tab==='equip'?['weapon','armor','acc'].includes(t):t===ui.tab}).sort((a,b)=>IT[a].t.localeCompare(IT[b].t)||IT[b].price-IT[a].price);
+  panel.innerHTML=`<h2>🎒 持ち物</h2><div class="box dim">ATK <b>${st.atk}</b> / DEF <b>${st.def}</b> / HP ${st.hp} / MP ${st.mp}　💰${fmt(S.gold)}G</div>
+  <div class="tabs">${tabs.map(t=>btn(t[1],'itab',t[0],ui.tab===t[0]?'on':'')).join('')}</div>${logBox()}`+
+  (ids.map(id=>{
+    const i=IT[id],eq=S.eq[i.t]===id,e=S.enh[id]||0;let b='';
+    if(['weapon','armor','acc'].includes(i.t))b=eq?btn('外す','unequip',i.t,'sm'):btn('装備','equip',id,'sm');
+    else if(i.t==='use'){const usable=!!(i.heal||i.mp||i.perm);b=btn('使う','useitem',id,'sm',!usable)}
+    return `<div class="item"><div class="l">${iname(id)}${e?` <b class="hl">+${e}</b>`:''}${eq?' <span class="ok">[装備中]</span>':''}<span class="tag ${i.r}">${RAR[i.r].n}</span> ×${S.inv[id]}<br><span class="dim">${statTxt(i)||i.desc||''}</span></div><div class="r">${b}</div></div>`}).join('')||'<p class="dim">何もありません。</p>')+`<div class="col">${btn('戻る','home')}</div>`;
+};
+ACT.itab=t=>{ui.tab=t;ui.log=[];render()};
+ACT.useitem=id=>{
+  const m=applyItem(id,false);ui.log=[];
+  if(!m){sfx('err');say('今は使っても効果がなさそうだ。')}else{say(`${iname(id)}を使った。${m}`);autosave()}
+  render();
+};
+SCR.skills=()=>{
+  const list=SK.filter(k=>k.job===S.job||k.job==='any');
+  panel.innerHTML=`<h2>✨ スキルツリー</h2><p class="dim">${JOBS[S.job].n} ／ スキルポイント <b class="hl">${S.sp}</b>（レベルアップごとに+1）</p>${logBox()}`+
+  list.map(k=>{
+    const has=!!S.skills[k.id],reqOk=!k.req||S.skills[k.req],lvOk=S.lv>=k.lv,can=!has&&reqOk&&lvOk&&S.sp>=k.cost;
+    const why=has?'<span class="ok">習得済</span>':!lvOk?`Lv${k.lv}で解放`:!reqOk?`「${SKM[k.req].n}」が必要`:`必要SP ${k.cost}`;
+    return `<div class="item"><div class="l"><b>${k.n}</b> <span class="tag ${k.k==='pas'?'rare':'epic'}">${k.k==='pas'?'パッシブ':'MP'+k.mp}</span><br><span class="dim">${k.d}</span><br><span class="dim">${why}</span></div><div class="r">${has?'':btn('習得','learn',k.id,'sm',!can)}</div></div>`}).join('')+`<div class="col">${btn('戻る','home')}</div>`;
+};
+ACT.learn=id=>{
+  const k=SKM[id];if(!k||S.skills[id]||S.sp<k.cost||S.lv<k.lv||(k.req&&!S.skills[k.req]))return sfx('err');
+  S.sp-=k.cost;S.skills[id]=1;const st=stats();S.hp=Math.min(S.hp,st.hp);sfx('levelup');ui.log=[];say(`スキル「${k.n}」を習得した！`);autosave();render();
+};
+
+/* ============ 図鑑・実績 ============ */
+const SPU={};
+function spriteURL(id){
+  if(SPU[id])return SPU[id];
+  const m=MON[id],rows=SPR[m.sh],c=document.createElement('canvas');c.width=48;c.height=48;
+  const x=c.getContext('2d');x.imageSmoothingEnabled=false;drawSpr(rows,m.pal,0,48-rows.length*4,4,false,x);
+  return SPU[id]=c.toDataURL();
+}
+SCR.dex=()=>{
+  const ids=Object.keys(MON),seen=ids.filter(i=>S.dex[i]).length;
+  panel.innerHTML=`<h2>📖 モンスター図鑑 (${seen}/${ids.length})</h2><div class="dexg">${ids.map(id=>{
+    const d=S.dex[id],m=MON[id];
+    if(!d)return `<div class="dexc un"><img src="${spriteURL(id)}" alt=""><b>？？？</b><br><span class="dim">未発見</span></div>`;
+    return `<div class="dexc"><img src="${spriteURL(id)}" alt=""><b>${m.n}</b>${m.boss?' <span class="ng">BOSS</span>':''}<br>遭遇${d.s} 討伐${d.k}${d.k>0?`<br>HP${m.hp} ATK${m.atk} DEF${m.def}<br>${m.tr?TRAIT[m.tr]+'<br>':''}${m.d}`:'<br><span class="dim">倒すと詳細が判明</span>'}</div>`}).join('')}</div><div class="col">${btn('戻る','home')}</div>`;
+};
+SCR.ach=()=>{
+  const n=ACH.filter(a=>S.ach[a.id]).length;
+  panel.innerHTML=`<h2>🏆 実績と称号 (${n}/${ACH.length})</h2>`+ACH.map(a=>`<div class="item"><div class="l">${S.ach[a.id]?'<span class="ok">✔</span>':'<span class="dim">□</span>'} <b>${a.n}</b><br><span class="dim">称号『${a.ti}』 ／ 報酬：${giveRewardPreview(a.rw||{})}</span></div></div>`).join('')+`<div class="col">${btn('戻る','home')}</div>`;
+};
+
+/* ============ 筋トレ(任意のサブシステム) ============ */
+function trainToday(){const d=todayStr();return S.tclaim[d]||0}
+SCR.train=()=>{
+  const ed=ui.tedit?S.train.find(r=>r.id===ui.tedit):null,d=todayStr(),rest=!!S.rest[d];
+  const v=ed||{ex:'pushup',reps:10,sets:3,kg:0,note:''};
+  let week='';const now=new Date();
+  const days=[];for(let i=0;i<7;i++){const t=new Date(now);t.setDate(now.getDate()-i);days.push(t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0'))}
+  const recs=S.train.filter(r=>days.includes(r.d));
+  const tot={};recs.forEach(r=>{tot[r.ex]=(tot[r.ex]||0)+r.reps*r.sets});
+  week=Object.keys(tot).map(k=>`${EX[k].n} ${tot[k]}${EX[k].u}`).join(' ／ ')||'記録なし';
+  panel.innerHTML=`<h2>💪 鍛錬の間 <small class="dim">(任意)</small></h2>
+  <div class="box"><p class="txt">ここは<b>完全に任意</b>の記録の場所です。やらなくても、冒険・戦闘・クエストだけで強くなれます。</p>
+  <p class="dim">無理は禁物。痛みや体調不良のある日は休みましょう。現実の運動を求める要素はありません。</p></div>
+  ${logBox()}
+  <div class="box"><b>${ed?'記録を修正':'今日の記録をつける'}</b>
+  <label>種目</label><select id="t_ex">${Object.keys(EX).map(k=>`<option value="${k}"${v.ex===k?' selected':''}>${EX[k].n}</option>`).join('')}</select>
+  <div class="grid2"><div><label>回数(プランクは秒)</label><input id="t_reps" type="number" min="1" max="900" inputmode="numeric" value="${v.reps}"></div><div><label>セット数</label><input id="t_sets" type="number" min="1" max="30" inputmode="numeric" value="${v.sets}"></div></div>
+  <label>重さ kg (ダンベル種目のみ・任意)</label><input id="t_kg" type="number" min="0" max="200" step="0.5" inputmode="decimal" value="${v.kg||0}">
+  <label>メモ(任意)</label><input id="t_note" type="text" maxlength="40" value="${esc(v.note||'')}">
+  <div class="grid2">${ed?btn('修正を保存','tsave','','on')+btn('キャンセル','tcancel'):btn('記録する','tadd','','on')+btn('今日は休息日にする','trest','',rest?'':'', rest)}</div>
+  <p class="dim">経験値は1日に最大${TCAP}まで。今日の獲得：${trainToday()}/${TCAP}${rest?' ／ <span class="ok">今日は休息日 ✔</span>':''}</p></div>
+  <h3>直近7日の合計(自分の記録のみ)</h3><div class="box dim">${week}</div>
+  <h3>記録一覧</h3>${S.train.slice(0,30).map(r=>`<div class="item"><div class="l"><b>${EX[r.ex]?EX[r.ex].n:esc(r.ex)}</b> ${r.reps}${EX[r.ex]?EX[r.ex].u:''}×${r.sets}セット${r.kg?` ${r.kg}kg`:''}<br><span class="dim">${r.d} ／ EXP+${r.xp}${r.note?' ／ '+esc(r.note):''}</span></div><div class="r">${btn('修正','tedit',r.id,'sm')}${btn('削除','tdel',r.id,'sm')}</div></div>`).join('')||'<p class="dim">まだ記録がありません。</p>'}
+  <div class="col">${btn('戻る','home')}</div>`;
+};
+function readTrainForm(){
+  const ex=$('#t_ex').value,reps=Math.floor(+$('#t_reps').value),sets=Math.floor(+$('#t_sets').value);
+  let kg=+$('#t_kg').value||0;const note=$('#t_note').value.trim().slice(0,40);
+  const maxR=ex==='plank'?900:300;
+  if(!EX[ex]||!(reps>=1&&reps<=maxR)||!(sets>=1&&sets<=30)||kg<0||kg>200){ui.log=[];say(`<span class="ng">入力を確認してください(回数1〜${maxR}、セット1〜30)。</span>`);sfx('err');render();return null}
+  if(!EX[ex].w)kg=0;
+  return {ex,reps,sets,kg,note};
+}
+const rawXp=(ex,reps,sets)=>Math.max(1,Math.round(EX[ex].f*reps*sets));
+ACT.tadd=()=>{
+  const f=readTrainForm();if(!f)return;
+  const d=todayStr(),raw=rawXp(f.ex,f.reps,f.sets),used=S.tclaim[d]||0,xp=Math.max(0,Math.min(raw,TCAP-used));
+  S.tclaim[d]=used+xp;
+  S.train.unshift(Object.assign({id:Date.now()+'_'+rnd(0,999),d,raw,xp},f));if(S.train.length>300)S.train.length=300;
+  ui.log=[];sfx('heal');say(`💪 記録しました：${EX[f.ex].n} ${f.reps}${EX[f.ex].u}×${f.sets}`);
+  if(xp>0){say(`冒険の経験値 +${xp}`);gainExp(xp).forEach(say)}
+  else say('今日の経験値の上限に達しています。記録だけ残りました。無理せず休みましょう。');
+  if((S.train.filter(r=>r.d===d).reduce((s,r)=>s+r.sets,0))>=15)say('<span class="hl">今日はたくさん頑張りました。ゆっくり休んでね。</span>');
+  checkAch();autosave();render();
+};
+ACT.tedit=id=>{ui.tedit=id;ui.log=[];render();window.scrollTo(0,0)};
+ACT.tcancel=()=>{ui.tedit=null;ui.log=[];render()};
+ACT.tsave=()=>{
+  const r=S.train.find(x=>x.id===ui.tedit);if(!r){ui.tedit=null;return render()}
+  const f=readTrainForm();if(!f)return;
+  const raw=rawXp(f.ex,f.reps,f.sets);let extra=0;
+  if(raw>r.raw){extra=Math.max(0,Math.min(raw-r.raw,TCAP-(S.tclaim[r.d]||0)));S.tclaim[r.d]=(S.tclaim[r.d]||0)+extra;r.xp+=extra}
+  r.raw=raw;Object.assign(r,f);ui.tedit=null;ui.log=[];sfx('click');say('記録を修正しました。');
+  if(extra>0){say(`増えた分の経験値 +${extra}`);gainExp(extra).forEach(say)}
+  say('<span class="dim">※修正で経験値が減ることはありません。</span>');
+  autosave();render();
+};
+ACT.tdel=id=>confirmBox('この記録を削除しますか？(獲得済みの経験値は減りません)',()=>{S.train=S.train.filter(r=>r.id!==id);if(ui.tedit===id)ui.tedit=null;ui.log=[];say('記録を削除しました。');autosave();render()},'削除する');
+ACT.trest=()=>{
+  const d=todayStr();if(S.rest[d])return sfx('err');
+  S.rest[d]=true;ui.log=[];sfx('heal');say('🌙 今日は休息日。しっかり休むのも大切な冒険です。(EXP+15)');gainExp(15).forEach(say);
+  const st=stats();S.hp=Math.min(st.hp,S.hp+Math.floor(st.hp*.2));checkAch();autosave();render();
+};
+
+/* ============ セーブ・設定 ============ */
+function slotInfo(sl){
+  const d=readSave(sl);if(!d)return '<span class="dim">データなし</span>';
+  const s=d.s,dt=new Date(d.t||0);
+  return `${esc(s.name)} Lv${s.lv} ${JOBS[s.job].n}<br><span class="dim">${AREAS[s.loc]?AREAS[s.loc].n:'町'} ／ ${fmt(s.gold)}G ／ ${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}</span>`;
+}
+SCR.save=()=>{
+  const ok=storeOK();
+  panel.innerHTML=`<h2>💾 ${ui.fromTitle?'ロード':'セーブ / ロード'}</h2><p class="dim">進行状況はブラウザ(localStorage)に保存されます。重要な場面では自動セーブされます。</p>
+  ${ok?'':'<p class="ng">⚠ このブラウザでは保存できません。</p>'}${logBox()}`+
+  SLOTS.map(([sl,nm])=>`<div class="item"><div class="l"><b>${nm}</b><br>${slotInfo(sl)}</div><div class="r">${!ui.fromTitle&&sl!=='auto'?btn('セーブ','save',sl,'sm',!ok):''}${btn('ロード','load',sl,'sm',!readSave(sl))}</div></div>`).join('')+
+  `<div class="col">${ui.fromTitle?btn('タイトルへ','totitle'):btn('戻る','home')}</div>`;
+};
+ACT.save=sl=>{ui.log=[];if(writeSave(sl)){sfx('heal');say(`${SLOTS.find(x=>x[0]===sl)[1]}にセーブしました。`)}else{sfx('err');say('<span class="ng">セーブに失敗しました(保存領域を確認してください)。</span>')}render()};
+ACT.load=sl=>{
+  const run=()=>{if(loadSlot(sl)){ui.fromTitle=false;sfx('heal');afterLoad()}else{sfx('err');ui.log=[];say('<span class="ng">ロードに失敗しました。</span>');render()}};
+  if(ui.fromTitle)run();else confirmBox('現在の進行状況は失われます(未セーブ分)。ロードしますか？',run,'ロード');
+};
+SCR.settings=()=>{
+  panel.innerHTML=`<h2>⚙ 設定</h2><div class="box"><label>全体音量 <b id="vm">${Math.round(SET.m*100)}</b>%</label><input id="v_m" type="range" min="0" max="100" value="${Math.round(SET.m*100)}">
+  <label>BGM音量 <b id="vb">${Math.round(SET.b*100)}</b>%</label><input id="v_b" type="range" min="0" max="100" value="${Math.round(SET.b*100)}">
+  <label>効果音音量 <b id="vs">${Math.round(SET.s*100)}</b>%</label><input id="v_s" type="range" min="0" max="100" value="${Math.round(SET.s*100)}">
+  <label><input id="v_mute" type="checkbox"${SET.mute?' checked':''}> ミュート(すべての音を消す)</label>
+  <label><input id="v_calm" type="checkbox"${SET.calm?' checked':''}> 画面の揺れ・フラッシュを減らす</label></div>
+  <div class="grid2">${btn('効果音テスト','sndtest')}${btn('タイトルへ','totitle2')}</div>
+  <h3>データ管理</h3><p class="dim">全データを削除するとセーブも消えます。</p>${btn('すべてのデータを削除','wipe','','atk')}<div class="col">${btn('戻る','home')}</div>`;
+};
+ACT.sndtest=()=>{Snd.init();sfx('levelup')};
+ACT.totitle2=()=>{autosave();B=null;setScr('title')};
+ACT.wipe=()=>confirmBox('すべてのセーブデータを削除します。元に戻せません。本当によろしいですか？',()=>{
+  try{Object.keys(localStorage).filter(k=>k.startsWith('tq_save_')).forEach(k=>localStorage.removeItem(k))}catch(e){}
+  S=null;B=null;ui.log=[];toast('データを削除しました');setScr('title');
+},'削除する');
+
+/* ============ 入力・起動 ============ */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a]');if(!t||t.disabled)return;
+  Snd.init();Snd.resume();
+  const f=ACT[t.dataset.a];
+  if(!f)return;
+  if(!['atk','def','skill','bitem','flee','mok','mcancel'].includes(t.dataset.a))sfx('click');
+  try{f(t.dataset.g)}catch(err){console.error(err);toast('エラーが発生しました')}
+});
+document.addEventListener('input',e=>{
+  const id=e.target.id;if(!id||!id.startsWith('v_'))return;
+  if(id==='v_m'||id==='v_b'||id==='v_s'){
+    const v=(+e.target.value)/100,k=id.slice(2);SET[k]=v;$('#v'+k).textContent=Math.round(v*100);
+  }else if(id==='v_mute')SET.mute=e.target.checked;
+  else if(id==='v_calm')SET.calm=e.target.checked;
+  Snd.init();Snd.apply();saveSet();
+});
+document.addEventListener('change',e=>{if(e.target.id==='v_m'||e.target.id==='v_b'||e.target.id==='v_s')sfx('click')});
+window.addEventListener('beforeunload',()=>{try{if(S&&B===null)autosave()}catch(e){}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&S&&!B)autosave()});
+loadSet();
+render();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
